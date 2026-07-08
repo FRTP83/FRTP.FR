@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  background: #f6f8f9;
+  color: #2b3037;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+::selection {
+  background: #2f55a4;
+  color: #ffffff;
+}
+
+.technical-grid {
+  background-image:
+    linear-gradient(rgba(24, 53, 111, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 53, 111, 0.055) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.brand-cut {
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 0% 100%);
+}
+
+.asphalt-noise {
+  position: relative;
+}
+
+.asphalt-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px);
+  background-size: 17px 17px, 23px 23px;
+}
+
+.diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(199, 106, 0, 0.14) 0,
+    rgba(199, 106, 0, 0.14) 10px,
+    transparent 10px,
+    transparent 22px
+  );
+}
+
+.metal-surface {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(41, 79, 155, 0.11), transparent 30%),
+    linear-gradient(135deg, #ffffff 0%, #f6f8f9 46%, #eef1f3 100%);
+}
+
+.dark-panel {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(41, 79, 155, 0.24), transparent 34%),
+    radial-gradient(circle at 86% 20%, rgba(185, 104, 18, 0.16), transparent 32%),
+    #121418;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@media (max-width: 767px) {
+  .technical-grid {
+    background-size: 34px 34px;
+  }
+
+  .mobile-safe-section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+.rich-text {
+  display: grid;
+  gap: 1.5rem;
+  color: #3f4650;
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+.rich-text section {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.rich-text h2,
+.rich-text h3 {
+  color: #111418;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.rich-text h2 {
+  margin-top: 0.4rem;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+}
+
+.rich-text h3 {
+  font-size: 1.15rem;
+}
+
+.rich-text p {
+  margin: 0;
+}
+
+.rich-text strong {
+  color: #111418;
+  font-weight: 800;
+}
+
+.rich-text u {
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 0.08em;
+}
+
+.rich-text-align-left {
+  text-align: left;
+}
+
+.rich-text-align-center {
+  text-align: center;
+}
+
+.rich-text-align-right {
+  text-align: right;
+}
+
+.rich-text-align-justify {
+  text-align: justify;
+}
+
+.rich-text ul {
+  margin: 0;
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 1.15rem;
+}
+
+.rich-text li {
+  padding-left: 0.25rem;
+}
+
+.rich-text li::marker {
+  color: #c76a00;
+}
