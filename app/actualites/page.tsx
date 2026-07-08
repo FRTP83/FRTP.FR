@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SectionHeading } from "@/components/SectionHeading";
 import { getNewsForSite, getStudioSettings } from "@/lib/server-data";
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Actualités",

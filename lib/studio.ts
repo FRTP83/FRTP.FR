@@ -153,8 +153,8 @@ export const defaultStudioSettings: StudioSettings = {
   })),
   projectsPageTitle: "Des chantiers présentés par commune, catégorie et intervention.",
   projectsPageText: "Cette page affiche les chantiers publiés depuis l'espace admin Supabase.",
-  newsPageTitle: "Un espace pour les publications FRTP.",
-  newsPageText: "Cette page affiche les actualités publiées depuis l'administration.",
+  newsPageTitle: "Actualités FRTP.",
+  newsPageText: "Retrouvez les dernières informations de l'entreprise, les chantiers récents et les interventions réalisées sur le terrain.",
   beforeAfterTitle: "Montrer le terrain, pas seulement le discours.",
   beforeAfterText:
     "La page avant / après est prévue pour comparer les photos de chantier par phase : avant, pendant et après intervention.",
