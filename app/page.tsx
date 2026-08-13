@@ -30,7 +30,7 @@ export default async function HomePage() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-r from-frtp-black via-frtp-black/82 to-frtp-black/18" />
-          <div className="absolute bottom-0 left-0 h-32 w-full bg-gradient-to-t from-frtp-mist to-transparent" />
+          <div className="absolute bottom-0 left-0 h-32 w-full bg-gradient-to-t from-frtp-black to-transparent" />
         </div>
         <div className="relative mx-auto grid min-h-[calc(100dvh-72px)] max-w-7xl items-center gap-8 px-4 py-12 md:min-h-[82dvh] md:grid-cols-[1.08fr_0.92fr] md:px-6 md:py-20">
           <div>
