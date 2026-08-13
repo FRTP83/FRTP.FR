@@ -85,6 +85,140 @@ svg {
     #121418;
 }
 
+.invert-site {
+  color-scheme: dark;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(41, 79, 155, 0.24), transparent 34%),
+    radial-gradient(circle at 86% 20%, rgba(185, 104, 18, 0.16), transparent 32%),
+    #121418;
+  color: #f6f8f9;
+}
+
+.invert-site .bg-white,
+.invert-site .bg-white\/82,
+.invert-site .bg-white\/86,
+.invert-site .bg-white\/92,
+.invert-site .bg-white\/95,
+.invert-site .bg-frtp-mist,
+.invert-site .bg-frtp-gray {
+  background-color: #121418 !important;
+}
+
+.invert-site .metal-surface {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(41, 79, 155, 0.24), transparent 34%),
+    radial-gradient(circle at 86% 20%, rgba(185, 104, 18, 0.16), transparent 32%),
+    #121418 !important;
+}
+
+.invert-site .dark-panel {
+  background: #f6f8f9 !important;
+  color: #121418 !important;
+}
+
+.invert-site .dark-panel .absolute.bg-gradient-to-r {
+  background-image: linear-gradient(to right, rgba(18, 20, 24, 0.88), rgba(18, 20, 24, 0.7), rgba(18, 20, 24, 0.18)) !important;
+}
+
+.invert-site .dark-panel .text-white,
+.invert-site .dark-panel .text-zinc-100,
+.invert-site .dark-panel .text-zinc-200 {
+  color: #121418 !important;
+}
+
+.invert-site .dark-panel .bg-white,
+.invert-site .dark-panel .bg-white\/10,
+.invert-site .dark-panel .bg-white\/95 {
+  background-color: #121418 !important;
+  color: #f6f8f9 !important;
+}
+
+.invert-site .dark-panel .bg-frtp-graphite\/96 {
+  background-color: #eef1f3 !important;
+  color: #121418 !important;
+}
+
+.invert-site.technical-grid,
+.invert-site .technical-grid {
+  background-color: #121418 !important;
+  background-image:
+    linear-gradient(rgba(246, 248, 249, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(246, 248, 249, 0.055) 1px, transparent 1px);
+}
+
+.invert-site .text-zinc-950,
+.invert-site .text-zinc-900,
+.invert-site .text-zinc-800,
+.invert-site .text-frtp-graphite {
+  color: #f6f8f9 !important;
+}
+
+.invert-site .text-zinc-700,
+.invert-site .text-zinc-600,
+.invert-site .text-zinc-500 {
+  color: #cfd7e2 !important;
+}
+
+.invert-site .text-frtp-blue,
+.invert-site .text-frtp-blueDark {
+  color: #9ab6ff !important;
+}
+
+.invert-site .border-zinc-200,
+.invert-site .border-zinc-100,
+.invert-site .border-zinc-900\/10 {
+  border-color: rgba(246, 248, 249, 0.16) !important;
+}
+
+.invert-site .ring-zinc-900\/8 {
+  --tw-ring-color: rgba(246, 248, 249, 0.1) !important;
+}
+
+.invert-site .rich-text {
+  color: #cfd7e2;
+}
+
+.invert-site .rich-text h2,
+.invert-site .rich-text h3,
+.invert-site .rich-text strong {
+  color: #f6f8f9;
+}
+
+.invert-site input,
+.invert-site textarea,
+.invert-site select {
+  background: #121418;
+  color: #f6f8f9;
+  border-color: rgba(246, 248, 249, 0.22);
+}
+
+.header-inverted,
+.footer-inverted {
+  background: #f6f8f9 !important;
+  color: #121418 !important;
+}
+
+.header-inverted {
+  border-color: rgba(18, 20, 24, 0.1) !important;
+}
+
+.header-inverted .text-zinc-200,
+.header-inverted .text-zinc-100,
+.footer-inverted .text-white,
+.footer-inverted .text-zinc-400,
+.footer-inverted .text-zinc-300,
+.footer-inverted .text-zinc-200 {
+  color: #121418 !important;
+}
+
+.footer-inverted {
+  border-top: 1px solid rgba(18, 20, 24, 0.1);
+}
+
+.footer-inverted .border-white\/15 {
+  border-color: rgba(18, 20, 24, 0.16) !important;
+}
+
 .text-balance {
   text-wrap: balance;
 }

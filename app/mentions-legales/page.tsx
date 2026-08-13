@@ -14,7 +14,7 @@ export default async function LegalPage() {
   const studio = await getStudioSettings();
 
   return (
-    <section className="bg-white px-4 py-10 md:px-6 md:py-16">
+    <section className="invert-site bg-white px-4 py-10 md:px-6 md:py-16">
       <div className="mx-auto max-w-4xl">
         <SectionHeading eyebrow="Legal" title={studio.legalTitle} />
         <RichText content={studio.legalText} className="mt-6 md:mt-8" />

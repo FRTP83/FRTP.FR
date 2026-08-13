@@ -13,7 +13,7 @@ export default async function NewsPage() {
   const [news, studio] = await Promise.all([getNewsForSite(), getStudioSettings()]);
 
   return (
-    <section className="bg-white px-4 py-10 md:px-6 md:py-16">
+    <section className="invert-site bg-white px-4 py-10 md:px-6 md:py-16">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="Actualites & chantiers"

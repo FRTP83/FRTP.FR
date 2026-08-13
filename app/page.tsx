@@ -80,6 +80,7 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <div className="invert-site">
       <section className="border-b border-zinc-200 bg-frtp-mist">
         <div className="mx-auto grid max-w-7xl grid-cols-2 px-4 md:grid-cols-4 md:px-6">
           {studio.stats.map((stat, index) => (
@@ -243,6 +244,7 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+      </div>
     </>
   );
 }

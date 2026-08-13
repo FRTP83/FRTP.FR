@@ -14,7 +14,7 @@ export default async function ProjectsPage() {
   const [projects, studio] = await Promise.all([getProjectsForSite(), getStudioSettings()]);
 
   return (
-    <section className="technical-grid bg-frtp-gray px-4 py-10 md:px-6 md:py-16">
+    <section className="invert-site technical-grid bg-frtp-gray px-4 py-10 md:px-6 md:py-16">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           eyebrow="Nos réalisations"

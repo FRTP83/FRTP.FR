@@ -53,7 +53,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   };
 
   return (
-    <article className="bg-white">
+    <article className="invert-site bg-white">
       <section data-parallax-section className="relative min-h-[46dvh] overflow-hidden bg-zinc-950 px-4 py-14 text-white md:min-h-[62dvh] md:px-6 md:py-20">
         <Image
           src={heroSettings.imageUrl || project.image}

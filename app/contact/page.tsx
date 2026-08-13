@@ -15,7 +15,7 @@ export default async function ContactPage() {
   const studio = await getStudioSettings();
 
   return (
-    <section className="technical-grid bg-frtp-gray px-4 py-10 md:px-6 md:py-16">
+    <section className="invert-site technical-grid bg-frtp-gray px-4 py-10 md:px-6 md:py-16">
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[0.8fr_1.2fr] md:items-start lg:gap-10">
         <div>
           <SectionHeading

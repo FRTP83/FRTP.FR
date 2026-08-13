@@ -18,7 +18,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-900/10 bg-frtp-mist/95 backdrop-blur-xl">
+    <header className="header-inverted fixed inset-x-0 top-0 z-50 border-b border-zinc-900/10 bg-frtp-mist/95 backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-6">
         <Link href="/" aria-label="Accueil FRTP" className="flex items-center" onClick={closeMenu}>
           <Logo className="h-10 w-auto md:h-14" />

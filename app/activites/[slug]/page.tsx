@@ -46,7 +46,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
   const related = projects.filter((project) => isProjectRelatedToActivity(project.category, activity.slug, activity.title));
 
   return (
-    <section className="bg-white px-4 py-10 md:px-6 md:py-16">
+    <section className="invert-site bg-white px-4 py-10 md:px-6 md:py-16">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start lg:gap-10">
           <div>
