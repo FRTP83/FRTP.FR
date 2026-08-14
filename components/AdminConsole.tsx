@@ -398,6 +398,7 @@ export function AdminConsole() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     const title = String(formData.get("title"));
+    const publicationDate = nullable(formData.get("published_at"));
     let coverImageUrl = selectedNews?.cover_image_url ?? null;
     const image = formData.get("image") as File | null;
 
@@ -419,6 +420,7 @@ export function AdminConsole() {
       content: nullable(formData.get("content")),
       cover_image_url: coverImageUrl,
       is_published: formData.get("is_published") === "on",
+      created_at: publicationDate ? new Date(`${publicationDate}T12:00:00`).toISOString() : new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
@@ -1492,6 +1494,7 @@ function NewsForm({
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Titre" name="title" defaultValue={news?.title} required />
         <Field label="Slug" name="slug" defaultValue={news?.slug} />
+        <Field label="Date de publication" name="published_at" type="date" defaultValue={dateInputValue(news?.created_at)} />
         <Field label="Image principale" name="image" type="file" />
       </div>
       <TextArea label="Extrait" name="excerpt" defaultValue={news?.excerpt} />
@@ -1723,6 +1726,15 @@ function formatText(text: string, format: TextFormat) {
 function nullable(value: FormDataEntryValue | null) {
   const text = String(value ?? "").trim();
   return text ? text : null;
+}
+
+function dateInputValue(value?: string | null) {
+  if (!value) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? new Date().toISOString().slice(0, 10) : date.toISOString().slice(0, 10);
 }
 
 function heroSettingsFromForm(formData: FormData) {
