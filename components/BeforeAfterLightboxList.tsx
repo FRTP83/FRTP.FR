@@ -12,13 +12,14 @@ type BeforeAfterLightboxListProps = {
 type LightboxPhoto = {
   id: string;
   src: string;
-  label: "Avant" | "Apres";
+  label: "Avant" | "Après";
   title: string;
   city: string;
   category: string;
 };
 
 export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps) {
+  const [activeCategory, setActiveCategory] = useState("__all__");
   const photos = useMemo<LightboxPhoto[]>(
     () => pairs.flatMap((pair) => [
       {
@@ -32,13 +33,26 @@ export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps)
       {
         id: `${pair.id}-after`,
         src: pair.after,
-        label: "Apres",
+        label: "Après",
         title: pair.title,
         city: pair.city,
         category: pair.category
       }
     ]),
     [pairs]
+  );
+  const categoryCounts = useMemo(
+    () => Array.from(
+      pairs.reduce((map, pair) => {
+        map.set(pair.category, (map.get(pair.category) ?? 0) + 1);
+        return map;
+      }, new Map<string, number>())
+    ),
+    [pairs]
+  );
+  const visiblePairs = useMemo(
+    () => activeCategory === "__all__" ? pairs : pairs.filter((pair) => pair.category === activeCategory),
+    [activeCategory, pairs]
   );
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const activePhoto = activeIndex === null ? null : photos[activeIndex];
@@ -84,23 +98,42 @@ export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps)
 
   return (
     <>
-      <div className="mt-8 grid gap-6 md:mt-12 md:gap-8">
-        {pairs.map((pair) => {
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          className={`projects-index-filter ${activeCategory === "__all__" ? "is-active" : ""}`}
+          onClick={() => setActiveCategory("__all__")}
+          aria-pressed={activeCategory === "__all__"}
+        >
+          Toutes les comparaisons <small>{pairs.length}</small>
+        </button>
+        {categoryCounts.map(([category, count]) => (
+          <button
+            key={category}
+            type="button"
+            className={`projects-index-filter ${activeCategory === category ? "is-active" : ""}`}
+            onClick={() => setActiveCategory(category)}
+            aria-pressed={activeCategory === category}
+          >
+            {category} <small>{count}</small>
+          </button>
+        ))}
+      </div>
+
+      <div className="before-after-index-grid mt-8 md:mt-12">
+        {visiblePairs.map((pair) => {
           const beforeIndex = photos.findIndex((photo) => photo.id === `${pair.id}-before`);
           const afterIndex = photos.findIndex((photo) => photo.id === `${pair.id}-after`);
 
           return (
-            <article key={pair.id} className="border border-zinc-200 bg-frtp-gray p-4 md:p-6">
-              <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-frtp-orange md:text-xs md:tracking-[0.24em]">{pair.category}</p>
-                  <h2 className="mt-2 text-xl font-black text-zinc-950 md:text-2xl">{pair.title}</h2>
-                  <p className="mt-1 font-semibold text-zinc-600">{pair.city}</p>
-                </div>
-              </div>
-              <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-2 md:gap-4">
+            <article key={pair.id} className="before-after-index-card">
+              <div className="before-after-index-photos">
                 <PhotoButton label="Avant" src={pair.before} title={pair.title} onOpen={() => setActiveIndex(beforeIndex)} />
-                <PhotoButton label="Apres" src={pair.after} title={pair.title} onOpen={() => setActiveIndex(afterIndex)} />
+                <PhotoButton label="Après" src={pair.after} title={pair.title} onOpen={() => setActiveIndex(afterIndex)} />
+              </div>
+              <div className="before-after-index-caption">
+                <p>{pair.title}</p>
+                <span>{pair.city} - {pair.category}</span>
               </div>
             </article>
           );
@@ -112,7 +145,7 @@ export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps)
           className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/95 px-4 py-5 text-white backdrop-blur-sm md:px-8 md:py-8"
           role="dialog"
           aria-modal="true"
-          aria-label="Photo avant apres agrandie"
+          aria-label="Photo avant après agrandie"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               setActiveIndex(null);
@@ -176,20 +209,20 @@ export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps)
   );
 }
 
-function PhotoButton({ label, src, title, onOpen }: { label: "Avant" | "Apres"; src: string; title: string; onOpen: () => void }) {
+function PhotoButton({ label, src, title, onOpen }: { label: "Avant" | "Après"; src: string; title: string; onOpen: () => void }) {
   return (
     <button
       type="button"
       onClick={onOpen}
-      className="group relative aspect-[16/10] overflow-hidden bg-zinc-200 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-frtp-orange focus-visible:ring-offset-2"
+      className="before-after-photo-button group"
       aria-label={`Agrandir la photo ${label.toLowerCase()}`}
     >
       <Image src={src} alt={`${label} - ${title}`} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition duration-300 group-hover:scale-[1.03]" />
-      <span className="absolute inset-0 bg-zinc-950/0 transition group-hover:bg-zinc-950/25" />
-      <span className="absolute left-4 top-4 bg-zinc-950 px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
+      <span className="before-after-photo-shade" />
+      <span className="before-after-photo-label">
         {label}
       </span>
-      <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-frtp-blue opacity-0 shadow-lg transition group-hover:opacity-100">
+      <span className="before-after-photo-zoom">
         <Maximize2 size={14} />
         Agrandir
       </span>

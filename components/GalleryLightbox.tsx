@@ -17,7 +17,7 @@ type GalleryLightboxProps = {
 const typeLabels: Record<string, string> = {
   before: "Avant",
   during: "Pendant",
-  after: "Apres",
+  after: "Après",
   gallery: "Galerie"
 };
 
@@ -66,13 +66,13 @@ export function GalleryLightbox({ images, title }: GalleryLightboxProps) {
 
   return (
     <>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 md:mt-6 md:grid-cols-3 md:gap-4">
+      <div className="project-gallery-grid mt-5 md:mt-6">
         {images.map((image, index) => (
           <button
             key={image.url + index}
             type="button"
             onClick={() => setActiveIndex(index)}
-            className="group relative aspect-[4/3] overflow-hidden bg-zinc-100 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-frtp-orange focus-visible:ring-offset-2"
+            className={index === 0 ? "project-gallery-item is-featured group" : "project-gallery-item group"}
             aria-label={`Agrandir la photo ${index + 1}`}
           >
             <Image

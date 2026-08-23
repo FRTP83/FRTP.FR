@@ -21,7 +21,8 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { slugify } from "@/lib/utils";
 import { defaultBeforeAfterItems, type BeforeAfterItem } from "@/lib/before-after";
 import { defaultProjectHeroSettings, normalizeProjectHeroSettings, type ProjectHeroSettings, type ProjectHeroSettingsMap } from "@/lib/project-hero";
-import { defaultStudioSettings, type StudioReview, type StudioSettings } from "@/lib/studio";
+import { defaultStudioSettings, type StudioActivity, type StudioReview, type StudioSettings, type StudioStat } from "@/lib/studio";
+import { normalizeCopyObject, normalizeFrenchCopy } from "@/lib/french-copy";
 
 type AdminStatus = "checking" | "signed-out" | "signed-in";
 type TabId = "studio" | "beforeAfter" | "projects" | "news" | "requests";
@@ -119,12 +120,25 @@ export function AdminConsole() {
       return;
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      const signedIn = Boolean(data.session);
-      setStatus(signedIn ? "signed-in" : "signed-out");
-      if (signedIn) {
-        refreshAdminData();
+    const client = supabase;
+
+    client.auth.getSession().then(async ({ data }) => {
+      if (!data.session) {
+        setStatus("signed-out");
+        return;
       }
+
+      const isAdmin = await hasAdminMembership();
+
+      if (!isAdmin) {
+        await client.auth.signOut();
+        setStatus("signed-out");
+        setNotice("Ce compte ne dispose pas des droits d’administration.");
+        return;
+      }
+
+      setStatus("signed-in");
+      refreshAdminData();
     });
   }, []);
 
@@ -163,18 +177,18 @@ export function AdminConsole() {
         : Promise.resolve({ data: null, error: null })
     ]);
 
-    if (categoryResult.data) setCategories(categoryResult.data as Category[]);
-    if (projectResult.data) setProjects(projectResult.data as unknown as ProjectRow[]);
-    if (newsResult.data) setNews(newsResult.data as NewsRow[]);
-    if (requestResult.data) setRequests(requestResult.data as RequestRow[]);
+    if (categoryResult.data) setCategories(normalizeCopyObject(categoryResult.data as Category[]));
+    if (projectResult.data) setProjects(normalizeCopyObject(projectResult.data as unknown as ProjectRow[]));
+    if (newsResult.data) setNews(normalizeCopyObject(newsResult.data as NewsRow[]));
+    if (requestResult.data) setRequests(normalizeCopyObject(requestResult.data as RequestRow[]));
     if (studioResult.data?.settings) {
-      setStudioSettings(studioResult.data.settings as StudioSettings);
+      setStudioSettings(normalizeCopyObject(studioResult.data.settings as StudioSettings));
     }
     if (beforeAfterResult.data?.items) {
-      setBeforeAfterItems(beforeAfterResult.data.items as BeforeAfterItem[]);
+      setBeforeAfterItems(normalizeCopyObject(beforeAfterResult.data.items as BeforeAfterItem[]));
     }
     if (projectHeroResult.data?.settings) {
-      setProjectHeroSettings(projectHeroResult.data.settings as ProjectHeroSettingsMap);
+      setProjectHeroSettings(normalizeCopyObject(projectHeroResult.data.settings as ProjectHeroSettingsMap));
     }
 
     const firstError = categoryResult.error ?? projectResult.error ?? newsResult.error ?? requestResult.error;
@@ -190,7 +204,7 @@ export function AdminConsole() {
     if (!supabase) return;
 
     const form = new FormData(event.currentTarget);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: String(form.get("email")),
       password: String(form.get("password"))
     });
@@ -200,9 +214,31 @@ export function AdminConsole() {
       return;
     }
 
+    if (!data.user || !(await hasAdminMembership())) {
+      await supabase.auth.signOut();
+      setStatus("signed-out");
+      setNotice("Ce compte ne dispose pas des droits d’administration.");
+      return;
+    }
+
     setNotice("");
     setStatus("signed-in");
     refreshAdminData();
+  }
+
+  async function hasAdminMembership() {
+    if (!supabase) return false;
+
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token;
+
+    if (!token) return false;
+
+    const response = await fetch("/api/admin/access", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    return response.ok;
   }
 
   async function signOut() {
@@ -224,7 +260,7 @@ export function AdminConsole() {
     setLoading(true);
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const title = String(formData.get("title"));
+    const title = normalizeFrenchCopy(String(formData.get("title")));
     const payload = {
       title,
       slug: String(formData.get("slug") || slugify(title)),
@@ -242,9 +278,10 @@ export function AdminConsole() {
       updated_at: new Date().toISOString()
     };
 
+    const normalizedPayload = normalizeCopyObject(payload);
     const result = selectedProject
-      ? await supabase.from("projects").update(payload).eq("id", selectedProject.id).select("id").single()
-      : await supabase.from("projects").insert(payload).select("id").single();
+      ? await supabase.from("projects").update(normalizedPayload).eq("id", selectedProject.id).select("id").single()
+      : await supabase.from("projects").insert(normalizedPayload).select("id").single();
 
     if (result.error || !result.data) {
       setNotice(result.error?.message ?? "Chantier non enregistré.");
@@ -397,7 +434,7 @@ export function AdminConsole() {
     setLoading(true);
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const title = String(formData.get("title"));
+    const title = normalizeFrenchCopy(String(formData.get("title")));
     const publicationDate = nullable(formData.get("published_at"));
     let coverImageUrl = selectedNews?.cover_image_url ?? null;
     const image = formData.get("image") as File | null;
@@ -424,9 +461,10 @@ export function AdminConsole() {
       updated_at: new Date().toISOString()
     };
 
+    const normalizedPayload = normalizeCopyObject(payload);
     const result = selectedNews
-      ? await supabase.from("news").update(payload).eq("id", selectedNews.id).select("id").single()
-      : await supabase.from("news").insert(payload).select("id").single();
+      ? await supabase.from("news").update(normalizedPayload).eq("id", selectedNews.id).select("id").single()
+      : await supabase.from("news").insert(normalizedPayload).select("id").single();
 
     if (result.error || !result.data) {
       setNotice(result.error?.message ?? "Actualité non enregistrée.");
@@ -864,6 +902,18 @@ function BeforeAfterImageField({ label, name, src }: { label: string; name: stri
   );
 }
 
+function moveArrayItem<T>(items: T[], index: number, direction: -1 | 1) {
+  const target = index + direction;
+
+  if (target < 0 || target >= items.length) {
+    return items;
+  }
+
+  const next = [...items];
+  [next[index], next[target]] = [next[target], next[index]];
+  return next;
+}
+
 function StudioForm({
   settings,
   onSubmit,
@@ -874,10 +924,30 @@ function StudioForm({
   loading: boolean;
 }) {
   const [reviewFields, setReviewFields] = useState<StudioReview[]>(settings.reviews);
+  const [companyCardFields, setCompanyCardFields] = useState(settings.companyCards);
+  const [methodStepFields, setMethodStepFields] = useState(settings.methodSteps);
+  const [statFields, setStatFields] = useState<StudioStat[]>(settings.stats);
+  const [activityFields, setActivityFields] = useState<StudioActivity[]>(settings.activities);
 
   useEffect(() => {
     setReviewFields(settings.reviews);
   }, [settings.reviews]);
+
+  useEffect(() => {
+    setCompanyCardFields(settings.companyCards);
+  }, [settings.companyCards]);
+
+  useEffect(() => {
+    setMethodStepFields(settings.methodSteps);
+  }, [settings.methodSteps]);
+
+  useEffect(() => {
+    setStatFields(settings.stats);
+  }, [settings.stats]);
+
+  useEffect(() => {
+    setActivityFields(settings.activities);
+  }, [settings.activities]);
 
   function addReview() {
     setReviewFields((current) => [
@@ -913,6 +983,30 @@ function StudioForm({
     )));
   }
 
+  function updateCompanyCard(index: number, key: "title" | "text", value: string) {
+    setCompanyCardFields((current) => current.map((card, itemIndex) => (
+      itemIndex === index ? { ...card, [key]: value } : card
+    )));
+  }
+
+  function updateMethodStep(index: number, key: "number" | "title" | "text", value: string) {
+    setMethodStepFields((current) => current.map((step, itemIndex) => (
+      itemIndex === index ? { ...step, [key]: value } : step
+    )));
+  }
+
+  function updateStat(index: number, key: keyof StudioStat, value: string) {
+    setStatFields((current) => current.map((stat, itemIndex) => (
+      itemIndex === index ? { ...stat, [key]: value } : stat
+    )));
+  }
+
+  function updateActivity(index: number, key: keyof StudioActivity, value: string | string[]) {
+    setActivityFields((current) => current.map((activity, itemIndex) => (
+      itemIndex === index ? { ...activity, [key]: value } : activity
+    )));
+  }
+
   return (
     <form onSubmit={onSubmit} className="grid gap-6">
       <section className="border border-zinc-200 bg-white p-6 shadow-technical">
@@ -942,10 +1036,18 @@ function StudioForm({
             <Field label="Titre page entreprise" name="companyTitle" defaultValue={settings.companyTitle} />
             <TextArea label="Texte de presentation" name="companyIntro" defaultValue={settings.companyIntro} />
             <ImageField label="Image entreprise" name="companyImage" src={settings.companyImage} />
-            {settings.companyCards.map((card, index) => (
-              <div key={index} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
-                <Field label={`Bloc entreprise ${index + 1} - titre`} name={`companyCardTitle${index}`} defaultValue={card.title} />
-                <TextArea label={`Bloc entreprise ${index + 1} - texte`} name={`companyCardText${index}`} defaultValue={card.text} />
+            <input type="hidden" name="companyCardsLength" value={companyCardFields.length} />
+            {companyCardFields.map((card, index) => (
+              <div key={`${index}-${card.title}`} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+                <ReorderControls
+                  label={`Bloc entreprise ${index + 1}`}
+                  onMoveUp={() => setCompanyCardFields((current) => moveArrayItem(current, index, -1))}
+                  onMoveDown={() => setCompanyCardFields((current) => moveArrayItem(current, index, 1))}
+                  disableUp={index === 0}
+                  disableDown={index === companyCardFields.length - 1}
+                />
+                <ControlledField label="Titre" name={`companyCardTitle${index}`} value={card.title} onChange={(value) => updateCompanyCard(index, "title", value)} />
+                <ControlledTextArea label="Texte" name={`companyCardText${index}`} value={card.text} onChange={(value) => updateCompanyCard(index, "text", value)} />
               </div>
             ))}
             <TextArea label="Piliers entreprise" name="companyPillars" defaultValue={settings.companyPillars.join("\n")} />
@@ -954,13 +1056,21 @@ function StudioForm({
         </section>
 
         <section className="border border-zinc-200 bg-white p-6">
-          <h3 className="text-xl font-black text-zinc-950">Méthode terrain</h3>
+          <h3 className="text-xl font-black text-zinc-950">Methode terrain</h3>
           <div className="mt-5 grid gap-5">
             <Field label="Titre" name="methodTitle" defaultValue={settings.methodTitle} />
             <TextArea label="Texte" name="methodText" defaultValue={settings.methodText} />
-            {settings.methodSteps.map((step, index) => (
-              <div key={index} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
-                <Field label={`Étape ${index + 1} - numéro`} name={`methodStepNumber${index}`} defaultValue={step.number} />
+            <input type="hidden" name="methodStepsLength" value={methodStepFields.length} />
+            {methodStepFields.map((step, index) => (
+              <div key={`${step.number}-${step.title}`} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+                <ReorderControls
+                  label={`Etape ${index + 1}`}
+                  onMoveUp={() => setMethodStepFields((current) => moveArrayItem(current, index, -1))}
+                  onMoveDown={() => setMethodStepFields((current) => moveArrayItem(current, index, 1))}
+                  disableUp={index === 0}
+                  disableDown={index === methodStepFields.length - 1}
+                />
+                <Field label={`Etape ${index + 1} - numero`} name={`methodStepNumber${index}`} defaultValue={step.number} />
                 <Field label={`Etape ${index + 1} - titre`} name={`methodStepTitle${index}`} defaultValue={step.title} />
                 <TextArea label={`Etape ${index + 1} - texte`} name={`methodStepText${index}`} defaultValue={step.text} />
               </div>
@@ -981,8 +1091,16 @@ function StudioForm({
         <section className="border border-zinc-200 bg-white p-6 xl:col-span-2">
           <h3 className="text-xl font-black text-zinc-950">Accueil - sections et chiffres</h3>
           <div className="mt-5 grid gap-5 md:grid-cols-2">
-            {settings.stats.map((stat, index) => (
-              <div key={index} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+            <input type="hidden" name="statsLength" value={statFields.length} />
+            {statFields.map((stat, index) => (
+              <div key={`${stat.value}-${stat.label}`} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+                <ReorderControls
+                  label={`Chiffre ${index + 1}`}
+                  onMoveUp={() => setStatFields((current) => moveArrayItem(current, index, -1))}
+                  onMoveDown={() => setStatFields((current) => moveArrayItem(current, index, 1))}
+                  disableUp={index === 0}
+                  disableDown={index === statFields.length - 1}
+                />
                 <Field label={`Chiffre ${index + 1}`} name={`statValue${index}`} defaultValue={stat.value} />
                 <Field label={`Libelle ${index + 1}`} name={`statLabel${index}`} defaultValue={stat.label} />
               </div>
@@ -1056,10 +1174,18 @@ function StudioForm({
           <div className="mt-5 grid gap-5">
             <Field label="Titre page Activités" name="activitiesPageTitle" defaultValue={settings.activitiesPageTitle} />
             <TextArea label="Texte page Activités" name="activitiesPageText" defaultValue={settings.activitiesPageText} />
+            <input type="hidden" name="activitiesLength" value={activityFields.length} />
             <div className="grid gap-5 md:grid-cols-2">
-              {settings.activities.map((activity) => (
+              {activityFields.map((activity, index) => (
                 <div key={activity.slug} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-frtp-blue">{activity.slug}</p>
+                  <ReorderControls
+                    label={activity.slug}
+                    onMoveUp={() => setActivityFields((current) => moveArrayItem(current, index, -1))}
+                    onMoveDown={() => setActivityFields((current) => moveArrayItem(current, index, 1))}
+                    disableUp={index === 0}
+                    disableDown={index === activityFields.length - 1}
+                  />
+                  <input type="hidden" name={`activitySlug${index}`} value={activity.slug} />
                   <Field label="Titre" name={`activityTitle-${activity.slug}`} defaultValue={activity.title} />
                   <TextArea label="Description" name={`activityDescription-${activity.slug}`} defaultValue={activity.description} />
                   <TextArea label="Prestations" name={`activityServices-${activity.slug}`} defaultValue={activity.services.join("\n")} />
@@ -1542,6 +1668,34 @@ function FormTitle({ icon: Icon, title }: { icon: typeof FolderKanban; title: st
   );
 }
 
+function ReorderControls({
+  label,
+  onMoveUp,
+  onMoveDown,
+  disableUp,
+  disableDown
+}: {
+  label: string;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  disableUp: boolean;
+  disableDown: boolean;
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <p className="text-xs font-black uppercase tracking-[0.2em] text-frtp-blue">{label}</p>
+      <div className="flex gap-2">
+        <button type="button" onClick={onMoveUp} disabled={disableUp} className="border border-zinc-300 bg-white px-2 py-1 text-xs font-black text-zinc-700 disabled:opacity-40">
+          Monter
+        </button>
+        <button type="button" onClick={onMoveDown} disabled={disableDown} className="border border-zinc-300 bg-white px-2 py-1 text-xs font-black text-zinc-700 disabled:opacity-40">
+          Descendre
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function PublishControls({ published, featured }: { published?: boolean; featured?: boolean }) {
   return (
     <div className="flex flex-wrap gap-5">
@@ -1556,6 +1710,46 @@ function PublishControls({ published, featured }: { published?: boolean; feature
         </label>
       ) : null}
     </div>
+  );
+}
+
+function ControlledField({
+  label,
+  name,
+  value,
+  onChange
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-bold">
+      {label}
+      <input name={name} value={value} onChange={(event) => onChange(event.target.value)} className="h-12 border border-zinc-300 px-3 font-normal outline-none focus:border-frtp-blue" />
+    </label>
+  );
+}
+
+function ControlledTextArea({
+  label,
+  name,
+  value,
+  onChange,
+  rows = 4
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (value: string) => void;
+  rows?: number;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-bold">
+      {label}
+      <textarea name={name} rows={rows} value={value} onChange={(event) => onChange(event.target.value)} className="resize-none border border-zinc-300 px-3 py-3 font-normal outline-none focus:border-frtp-blue" />
+    </label>
   );
 }
 

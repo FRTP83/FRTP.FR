@@ -76,15 +76,20 @@ create table if not exists public.site_settings (
 -- "authenticated" (tout compte connecté). On restreint désormais la gestion
 -- aux comptes explicitement listés dans la table "admins".
 --
--- Après avoir exécuté ce schéma, ajouter votre compte admin :
---   insert into public.admins (user_id)
---   values ('<UUID du compte créé dans Supabase Auth>');
+-- Le compte Auth correspondant à contact@frtp.fr est ajouté automatiquement
+-- ci-dessous lorsqu'il existe déjà.
 -- ============================================================================
 
 create table if not exists public.admins (
   user_id uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
 );
+
+insert into public.admins (user_id)
+select id
+from auth.users
+where lower(email) = lower('contact@frtp.fr')
+on conflict (user_id) do nothing;
 
 create or replace function public.is_admin()
 returns boolean

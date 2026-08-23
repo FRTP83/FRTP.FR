@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { defaultBeforeAfterItems, type BeforeAfterItem } from "@/lib/before-after";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { slugify } from "@/lib/utils";
+import { hasAdminAccess } from "@/lib/admin-access";
+import { normalizeCopyObject } from "@/lib/french-copy";
 
 export async function GET(request: Request) {
   const supabase = getSupabaseAdmin();
@@ -50,7 +52,7 @@ export async function POST(request: Request) {
 
   for (let index = 0; index < count; index += 1) {
     const id = stringValue(formData, `itemId${index}`, crypto.randomUUID());
-    const title = stringValue(formData, `itemTitle${index}`, "Avant / apres chantier");
+    const title = stringValue(formData, `itemTitle${index}`, "Avant / après chantier");
     const currentBefore = stringValue(formData, `itemBeforeCurrent${index}`, "/chantier/bastide-jessica.jpeg");
     const currentAfter = stringValue(formData, `itemAfterCurrent${index}`, "/chantier/park-sainte-estelle.jpg");
 
@@ -70,7 +72,7 @@ export async function POST(request: Request) {
 
   const { error } = await supabase.from("site_settings").upsert({
     key: "before_after_items",
-    value: orderedItems,
+    value: normalizeCopyObject(orderedItems),
     updated_at: new Date().toISOString()
   }, { onConflict: "key" });
 
@@ -94,16 +96,11 @@ async function ensureAccess(request: Request) {
     return { ok: false, status: 401, error: "Session admin invalide." };
   }
 
-  const { data, error } = await supabase
-    .from("admins")
-    .select("user_id")
-    .eq("user_id", user.data.user.id)
-    .maybeSingle();
+  if (!(await hasAdminAccess(user.data.user.id, user.data.user.email))) {
+    return { ok: false, status: 403, error: "Accès non autorisé." };
+  }
 
-  if (!error) return { ok: Boolean(data), status: 403, error: "Acces non autorise." };
-  if (error.code === "PGRST205" || error.message.includes("Could not find the table")) return { ok: true };
-
-  return { ok: false, status: 403, error: "Acces non autorise." };
+  return { ok: true, status: 200, error: "" };
 }
 
 async function uploadOptionalImage(file: FormDataEntryValue | null, fallback: string, folder: string, title: string) {

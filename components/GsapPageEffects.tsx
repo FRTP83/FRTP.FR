@@ -21,45 +21,55 @@ export function GsapPageEffects({ children }: { children: ReactNode }) {
 
       gsap.defaults({ ease: "power3.out", duration: 0.85 });
 
-      gsap.from("[data-hero-line]", {
-        y: 34,
-        autoAlpha: 0,
-        stagger: 0.12,
-        duration: 1
-      });
+      const heroLines = scope.current?.querySelectorAll("[data-hero-line]");
+      const heroImage = scope.current?.querySelector("[data-hero-image]");
+      const revealElements = scope.current?.querySelectorAll("[data-gsap]");
+      const parallaxElement = scope.current?.querySelector("[data-parallax-slow]");
+      const parallaxSection = scope.current?.querySelector("[data-parallax-section]");
 
-      gsap.fromTo(
-        "[data-hero-image]",
-        { scale: 1.08 },
-        {
+      if (heroLines?.length) {
+        gsap.from(heroLines, {
+          y: 34,
+          autoAlpha: 0,
+          stagger: 0.12,
+          duration: 1
+        });
+      }
+
+      if (heroImage) {
+        gsap.fromTo(heroImage, { scale: 1.08 }, {
           scale: 1,
           duration: 1.8,
           ease: "power2.out"
-        }
-      );
+        });
+      }
 
-      ScrollTrigger.batch("[data-gsap]", {
-        start: "top 82%",
-        once: true,
-        onEnter: (elements) => {
-          gsap.fromTo(
-            elements,
-            { y: 44, autoAlpha: 0 },
-            { y: 0, autoAlpha: 1, stagger: 0.08, overwrite: true }
-          );
-        }
-      });
+      if (revealElements?.length) {
+        ScrollTrigger.batch(revealElements, {
+          start: "top 82%",
+          once: true,
+          onEnter: (elements) => {
+            gsap.fromTo(
+              elements,
+              { y: 44, autoAlpha: 0 },
+              { y: 0, autoAlpha: 1, stagger: 0.08, overwrite: true }
+            );
+          }
+        });
+      }
 
-      gsap.to("[data-parallax-slow]", {
-        yPercent: -8,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "[data-parallax-section]",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.7
-        }
-      });
+      if (parallaxElement && parallaxSection) {
+        gsap.to(parallaxElement, {
+          yPercent: -8,
+          ease: "none",
+          scrollTrigger: {
+            trigger: parallaxSection,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.7
+          }
+        });
+      }
 
       ScrollTrigger.refresh();
     },

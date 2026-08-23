@@ -9,4 +9,5 @@ yarn-debug.log*
 yarn-error.log*
 admin-access-local.txt
 tmp-localhost.*.log
+tmp/
 *.tsbuildinfo

@@ -2,11 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileText, ShieldCheck, Star, StarHalf } from "lucide-react";
 import { BeforeAfterHomeCarousel } from "@/components/BeforeAfterHomeCarousel";
-import { ProjectCard } from "@/components/ProjectCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { getActivitiesForSite, getBeforeAfterItemsForSite, getProjectsForSite, getStudioSettings } from "@/lib/server-data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function HomePage() {
   const [activities, beforeAfterItems, projects, studio] = await Promise.all([
@@ -26,11 +25,12 @@ export default async function HomePage() {
             alt="Chantier FRTP"
             fill
             sizes="100vw"
-            className="object-cover opacity-48 saturate-[0.9]"
+            className="object-cover opacity-[0.72] saturate-[0.95] contrast-[1.03]"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-frtp-black via-frtp-black/82 to-frtp-black/18" />
-          <div className="absolute bottom-0 left-0 h-32 w-full bg-gradient-to-t from-frtp-black to-transparent" />
+          <div className="home-hero-blue-filter absolute inset-0" />
+          <div className="absolute left-0 top-0 h-36 w-full bg-gradient-to-b from-[#091525]/55 via-[#0d1f38]/18 to-transparent" />
+          <div className="absolute bottom-0 left-0 h-32 w-full bg-gradient-to-t from-[#111419]/82 via-[#0f1d2f]/24 to-transparent" />
         </div>
         <div className="relative mx-auto grid min-h-[calc(100dvh-72px)] max-w-7xl items-center gap-8 px-4 py-12 md:min-h-[82dvh] md:grid-cols-[1.08fr_0.92fr] md:px-6 md:py-20">
           <div>
@@ -81,13 +81,13 @@ export default async function HomePage() {
       </section>
 
       <div className="invert-site">
-      <section className="border-b border-zinc-200 bg-frtp-mist">
+      <section className="home-stats-light section-light border-b border-zinc-200 bg-frtp-mist">
         <div className="mx-auto grid max-w-7xl grid-cols-2 px-4 md:grid-cols-4 md:px-6">
           {studio.stats.map((stat, index) => (
             <div
               data-gsap
               key={stat.label}
-              className={`bg-frtp-mist py-5 md:py-7 ${index % 2 === 1 ? "border-l border-zinc-200 pl-4 md:pl-0" : ""} ${index > 1 ? "border-t border-zinc-200 md:border-t-0" : ""} ${index > 0 ? "md:border-l md:border-zinc-200 md:pl-6" : ""}`}
+              className={`py-5 md:py-7 ${index % 2 === 1 ? "border-l border-zinc-200 pl-4 md:pl-0" : ""} ${index > 1 ? "border-t border-zinc-200 md:border-t-0" : ""} ${index > 0 ? "md:border-l md:border-zinc-200 md:pl-6" : ""}`}
             >
               <p className="font-mono text-2xl font-black text-frtp-blue md:text-3xl">{stat.value}</p>
               <p className="mt-2 text-xs font-semibold leading-5 text-zinc-600 md:text-sm">{stat.label}</p>
@@ -96,52 +96,65 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="metal-surface border-y border-zinc-200 px-4 py-12 md:px-6 md:py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-          <div data-gsap className="lg:sticky lg:top-28">
+      <section className="method-terrain-dark section-dark border-y border-white/10 px-4 py-14 text-white md:px-6 md:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div data-gsap className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">Méthode terrain</p>
-            <h2 className="mt-4 text-[2rem] font-black leading-tight tracking-tight text-zinc-950 md:text-5xl">
+            <h2 className="mt-4 max-w-2xl text-[2rem] font-black leading-tight tracking-tight text-white md:text-5xl">
               {studio.methodTitle}
             </h2>
-            <p className="mt-4 text-[15px] leading-7 text-zinc-600 md:mt-5 md:text-base md:leading-8">
+            <p className="mt-5 max-w-2xl text-[15px] font-medium leading-7 text-zinc-300 md:text-base md:leading-8">
               {studio.methodText}
             </p>
           </div>
-          <div className="grid gap-4">
+          <div className="method-steps-grid mt-12 grid gap-0 md:mt-16 md:grid-cols-4">
             {studio.methodSteps.map(({ number, title, text }) => (
-              <article data-gsap key={title} className="grid gap-3 bg-white/82 p-4 shadow-technical ring-1 ring-zinc-900/8 backdrop-blur md:grid-cols-[96px_1fr] md:gap-4 md:p-5">
-                <p className="font-mono text-3xl font-black text-frtp-blue md:text-4xl">{number}</p>
-                <div>
-                  <h3 className="text-xl font-black text-zinc-950 md:text-2xl">{title}</h3>
-                  <p className="mt-2 text-[15px] leading-7 text-zinc-600 md:text-base">{text}</p>
+              <article data-gsap key={title} className="method-step-item">
+                <div className="method-step-number-row">
+                  <p className="font-mono text-3xl font-medium text-frtp-blue md:text-4xl">{number}</p>
+                  <span aria-hidden="true" />
                 </div>
+                <h3 className="mt-6 text-lg font-black text-white md:text-xl">{title}</h3>
+                <p className="mt-4 max-w-[17rem] text-sm font-medium leading-7 text-zinc-300">{text}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-frtp-mist px-4 py-12 md:px-6 md:py-20">
+      <section className="home-activities-light section-light bg-frtp-mist px-4 py-10 md:px-6 md:py-14">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Activités"
             title={studio.homeActivitiesTitle}
             text={studio.homeActivitiesText}
           />
-          <div className="mt-8 grid gap-4 md:mt-12 md:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr]">
-            {activities.slice(0, 5).map((activity, index) => {
+          <div className="home-activities-list mt-7 grid md:mt-9 md:grid-cols-2 xl:grid-cols-3">
+            {activities.slice(0, 6).map((activity, index) => {
               const Icon = activity.icon;
               return (
                 <Link
                   data-gsap
                   key={activity.slug}
                   href={`/activites/${activity.slug}`}
-                  className={index === 0 ? "group bg-white p-5 shadow-technical ring-1 ring-zinc-900/8 md:row-span-2 md:p-6" : "group bg-white/86 p-5 shadow-technical ring-1 ring-zinc-900/8 transition hover:-translate-y-1 hover:bg-white md:p-6"}
+                  className="home-activity-card group bg-white p-4 shadow-technical ring-1 ring-zinc-900/8 transition md:p-5"
                 >
-                  <Icon size={30} className="text-frtp-blue" />
-                  <h3 className="mt-4 text-xl font-black text-zinc-950 md:mt-5 md:text-2xl">{activity.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-zinc-600">{activity.description}</p>
-                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-black text-frtp-orange">
+                  <div className="flex items-start gap-3">
+                    <span className="home-activity-index">{String(index + 1).padStart(2, "0")}</span>
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <Icon size={20} className="text-frtp-orange" />
+                        <h3 className="text-lg font-black text-zinc-950 md:text-xl">{activity.title}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="mt-3 max-w-xl text-sm font-medium leading-[1.45] text-zinc-600">{activity.description}</p>
+                  <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[12px] font-semibold leading-tight text-zinc-700">
+                    {activity.services.slice(0, 3).map((service) => (
+                      <span key={service} className="home-activity-service">{service}</span>
+                    ))}
+                  </div>
+                  <span className="mt-4 inline-flex items-center gap-2 text-[13px] font-black text-frtp-orange">
                     Détail de l'activité <ArrowRight size={17} />
                   </span>
                 </Link>
@@ -151,7 +164,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="technical-grid bg-frtp-gray px-4 py-12 md:px-6 md:py-20">
+      <section className="home-projects-dark section-dark technical-grid bg-frtp-gray px-4 py-12 md:px-6 md:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <SectionHeading
@@ -159,19 +172,42 @@ export default async function HomePage() {
               title={studio.homeProjectsTitle}
               text={studio.homeProjectsText}
             />
-            <Link href="/realisations" className="inline-flex items-center gap-2 font-black text-frtp-blue">
+            <Link href="/realisations" className="inline-flex min-h-11 items-center gap-2 font-black text-frtp-blue">
               Toutes les réalisations <ArrowRight size={18} />
             </Link>
           </div>
-          <div className="mt-8 grid gap-5 md:mt-12 md:grid-cols-2 lg:grid-cols-4">
+          <div className="home-project-showcase mt-8 grid gap-3 md:mt-12 md:grid-cols-2 lg:grid-cols-4">
             {projects.slice(0, 4).map((project) => (
-              <ProjectCard key={project.slug} project={project} />
+              <Link
+                data-gsap
+                key={project.slug}
+                href={`/realisations/${project.slug}`}
+                className="home-project-tile group"
+              >
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                  className="object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
+                />
+                <span className="home-project-overlay" />
+                <span className="home-project-category">{project.category}</span>
+                <span className="home-project-content">
+                  <span className="home-project-city">{project.city} · {project.date}</span>
+                  <span className="home-project-title">{project.title}</span>
+                  <span className="home-project-text">{project.short}</span>
+                  <span className="home-project-link">
+                    Voir le chantier <ArrowRight size={15} />
+                  </span>
+                </span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-frtp-mist px-4 py-12 md:px-6 md:py-20">
+      <section className="home-before-after-light section-light bg-frtp-mist px-4 py-12 md:px-6 md:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <div>
             <SectionHeading
@@ -191,7 +227,7 @@ export default async function HomePage() {
       </section>
 
       {studio.reviews.length > 0 ? (
-      <section className="metal-surface border-y border-zinc-200 px-4 py-12 md:px-6 md:py-20">
+      <section className="home-reviews-dark section-dark metal-surface border-y border-zinc-200 px-4 py-12 md:px-6 md:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
             <div>
@@ -230,15 +266,15 @@ export default async function HomePage() {
       </section>
       ) : null}
 
-      <section className="dark-panel px-4 py-12 text-white md:px-6 md:py-16">
+      <section className="home-cta-light section-light px-4 py-12 md:px-6 md:py-16">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-8 md:flex-row md:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">Contact rapide</p>
-            <h2 className="mt-3 max-w-2xl text-2xl font-black tracking-tight md:text-5xl">
+            <h2 className="mt-3 max-w-2xl text-2xl font-black tracking-tight text-zinc-950 md:text-5xl">
               {studio.homeCtaTitle}
             </h2>
           </div>
-          <Link href="/contact" className="inline-flex min-h-12 w-full items-center justify-center gap-2 bg-white px-5 py-4 text-sm font-black text-zinc-950 sm:w-auto">
+          <Link href="/contact" className="inline-flex min-h-12 w-full items-center justify-center gap-2 bg-frtp-blue px-5 py-4 text-sm font-black text-white sm:w-auto">
             <ShieldCheck size={19} />
             Demander un devis
           </Link>

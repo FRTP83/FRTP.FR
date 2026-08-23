@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { BeforeAfterItem } from "@/lib/before-after";
 
 type BeforeAfterHomeCarouselProps = {
@@ -15,7 +15,7 @@ export function BeforeAfterHomeCarousel({ items, fallbackBefore, fallbackAfter }
     ? items
     : [{
         id: "fallback",
-        title: "Avant / apres",
+        title: "Avant / après",
         city: "",
         category: "",
         before: fallbackBefore,
@@ -26,45 +26,33 @@ export function BeforeAfterHomeCarousel({ items, fallbackBefore, fallbackAfter }
   const [activeIndex, setActiveIndex] = useState(0);
   const activeSlide = slides[activeIndex] ?? slides[0];
 
-  useEffect(() => {
-    if (slides.length <= 1) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % slides.length);
-    }, 4200);
-
-    return () => window.clearInterval(timer);
-  }, [slides.length]);
-
   return (
     <div className="grid gap-4">
       <div className="grid grid-cols-2 gap-3 md:gap-4" aria-live="polite">
-        <figure className="group relative overflow-hidden bg-zinc-200">
+        <figure className="group relative overflow-hidden bg-transparent leading-none">
           <Image
             key={`${activeSlide.id}-before`}
             src={activeSlide.before}
             alt={`${activeSlide.title} avant travaux`}
             width={560}
             height={700}
-            className="aspect-[4/5] w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
+            className="block aspect-[4/5] w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
           />
           <figcaption className="absolute left-3 top-3 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-frtp-blue shadow-technical">
             Avant
           </figcaption>
         </figure>
-        <figure className="group relative mt-6 overflow-hidden bg-zinc-200 md:mt-10">
+        <figure className="group relative mt-6 overflow-hidden bg-transparent leading-none md:mt-10">
           <Image
             key={`${activeSlide.id}-after`}
             src={activeSlide.after}
-            alt={`${activeSlide.title} apres travaux`}
+            alt={`${activeSlide.title} après travaux`}
             width={560}
             height={700}
-            className="aspect-[4/5] w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
+            className="block aspect-[4/5] w-full object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
           />
           <figcaption className="absolute left-3 top-3 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-frtp-orange shadow-technical">
-            Apres
+            Après
           </figcaption>
         </figure>
       </div>
@@ -83,10 +71,12 @@ export function BeforeAfterHomeCarousel({ items, fallbackBefore, fallbackAfter }
                 key={slide.id}
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                className={index === activeIndex ? "h-2.5 w-8 bg-frtp-orange" : "h-2.5 w-2.5 bg-zinc-300 transition hover:bg-frtp-blue"}
+                className="group inline-flex h-11 min-w-11 items-center justify-center"
                 aria-label={`Afficher la comparaison ${index + 1}`}
                 aria-current={index === activeIndex}
-              />
+              >
+                <span className={index === activeIndex ? "h-2.5 w-8 bg-frtp-orange" : "h-2.5 w-2.5 bg-zinc-300 transition group-hover:bg-frtp-blue"} />
+              </button>
             ))}
           </div>
         ) : null}

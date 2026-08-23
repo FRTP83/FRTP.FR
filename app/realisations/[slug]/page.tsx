@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, CalendarDays, CheckCircle2, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Images, MapPin } from "lucide-react";
 import { GalleryLightbox } from "@/components/GalleryLightbox";
 import { projects } from "@/lib/data";
 import { getProjectForSite } from "@/lib/server-data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
@@ -28,7 +28,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${project.title} | FRTP`,
       description: project.short,
+      url: `/realisations/${project.slug}`,
       images: [{ url: project.image }]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} | FRTP`,
+      description: project.short,
+      images: [project.image]
     }
   };
 }
@@ -44,17 +51,19 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const galleryImages = project.galleryImages?.length
     ? project.galleryImages
     : [{ url: project.image, type: "gallery" }];
+  const photoLabel = galleryImages.length > 1 ? "photos" : "photo";
+  const viewLabel = galleryImages.length > 1 ? "vues" : "vue";
   const heroSettings = project.heroSettings ?? {
     imageUrl: project.image,
     positionX: 50,
     positionY: 50,
     zoom: 1,
-    overlay: 28
+    overlay: 34
   };
 
   return (
-    <article className="invert-site bg-white">
-      <section data-parallax-section className="relative min-h-[46dvh] overflow-hidden bg-zinc-950 px-4 py-14 text-white md:min-h-[62dvh] md:px-6 md:py-20">
+    <article className="project-detail-page bg-frtp-mist">
+      <section data-parallax-section className="project-detail-hero relative min-h-[62dvh] overflow-hidden bg-zinc-950 px-4 pb-16 pt-32 text-white md:min-h-[74dvh] md:px-6 md:pb-20 md:pt-36">
         <Image
           src={heroSettings.imageUrl || project.image}
           alt={project.title}
@@ -68,44 +77,87 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           }}
           priority
         />
-        <div className="absolute inset-0" style={{ backgroundColor: `rgba(9, 9, 11, ${heroSettings.overlay / 100})` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/35 via-zinc-950/10 to-transparent" />
-        <div className="relative mx-auto max-w-7xl drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
-          <p data-hero-line className="text-[11px] font-black uppercase tracking-[0.2em] text-frtp-orange md:text-xs md:tracking-[0.3em]">{project.category}</p>
-          <h1 data-hero-line className="mt-4 max-w-4xl text-[2.1rem] font-black leading-tight tracking-tight md:text-6xl">{project.title}</h1>
-          <div data-hero-line className="mt-5 flex flex-col gap-3 text-sm font-bold text-zinc-100 sm:flex-row sm:flex-wrap md:mt-6 md:gap-4">
+        <div className="absolute inset-0" style={{ backgroundColor: `rgba(9, 9, 11, ${Math.max(heroSettings.overlay, 34) / 100})` }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-frtp-black/88 via-frtp-black/42 to-frtp-black/12" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-frtp-black via-frtp-black/72 to-transparent" />
+        <div className="project-detail-hero-line absolute inset-x-0 bottom-0" />
+
+        <div className="relative mx-auto flex min-h-[calc(62dvh-12rem)] max-w-7xl flex-col justify-end drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)] md:min-h-[calc(74dvh-14rem)]">
+          <Link href="/realisations" className="mb-8 inline-flex w-fit items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-white/75 transition hover:text-white">
+            <ArrowLeft size={15} />
+            Tous les chantiers
+          </Link>
+          <p data-hero-line className="inline-flex w-fit bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-orange backdrop-blur md:text-xs md:tracking-[0.26em]">
+            {project.category}
+          </p>
+          <h1 data-hero-line className="mt-4 max-w-4xl text-balance font-display text-[2.4rem] font-bold leading-[0.98] tracking-tight md:text-6xl lg:text-7xl">
+            {project.title}
+          </h1>
+          <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-zinc-100/88 md:text-lg">
+            {project.short}
+          </p>
+          <div data-hero-line className="mt-6 flex flex-col gap-3 text-sm font-bold text-zinc-100 sm:flex-row sm:flex-wrap md:gap-4">
             <span className="inline-flex items-center gap-2"><MapPin size={18} />{project.city}</span>
             <span className="inline-flex items-center gap-2"><CalendarDays size={18} />{project.date}</span>
+            <span className="inline-flex items-center gap-2"><Images size={18} />{galleryImages.length} {photoLabel}</span>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-10 md:px-6 md:py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[0.7fr_1.3fr] lg:gap-10">
-          <aside data-gsap className="border-t-4 border-frtp-blue bg-frtp-gray p-5 md:p-6">
-            <h2 className="text-xl font-black text-zinc-950">Résumé chantier</h2>
-            <p className="mt-4 text-[15px] leading-7 text-zinc-600 md:text-base">{project.short}</p>
-            <Link href="/contact" className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-frtp-orange px-4 py-3 text-sm font-black text-white sm:w-auto">
-              Demander un devis <ArrowRight size={17} />
-            </Link>
-          </aside>
-          <div data-gsap>
-            <h2 className="text-2xl font-black tracking-tight text-zinc-950 md:text-3xl">Problématique initiale</h2>
-            <p className="mt-4 text-[15px] leading-7 text-zinc-600 md:text-base md:leading-8">{project.problem}</p>
+      <section className="project-detail-body bg-frtp-mist px-4 py-10 md:px-6 md:py-16">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.45fr_0.55fr] lg:items-start">
+          <div data-gsap className="project-detail-copy">
+            <p className="project-detail-eyebrow">Le chantier</p>
+            <h2>Problematique initiale</h2>
+            <p>{project.problem}</p>
 
-            <h2 className="mt-8 text-2xl font-black tracking-tight text-zinc-950 md:mt-10 md:text-3xl">Travaux réalisés</h2>
-            <div className="mt-5 grid gap-x-8 gap-y-3 md:grid-cols-2 xl:grid-cols-3">
+            <p className="project-detail-eyebrow mt-10">Travaux réalisés</p>
+            <div className="project-work-grid mt-4">
               {project.works.map((work) => (
-                <p key={work} className="flex min-w-0 items-start gap-3 text-[15px] font-semibold leading-6 text-zinc-700">
-                  <CheckCircle2 size={17} className="mt-0.5 shrink-0 text-frtp-blue" />
+                <p key={work}>
+                  <CheckCircle2 size={16} />
                   {work}
                 </p>
               ))}
             </div>
-
-            <h2 className="mt-8 text-2xl font-black tracking-tight text-zinc-950 md:mt-10 md:text-3xl">Galerie</h2>
-            <GalleryLightbox images={galleryImages} title={project.title} />
           </div>
+
+          <aside data-gsap className="project-detail-side">
+            <div className="project-detail-facts">
+              <div>
+                <span>Localisation</span>
+                <strong>{project.city}</strong>
+              </div>
+              <div>
+                <span>Annee</span>
+                <strong>{project.date}</strong>
+              </div>
+              <div>
+                <span>Photos</span>
+                <strong>{galleryImages.length} {viewLabel} du chantier</strong>
+              </div>
+            </div>
+            <div className="project-detail-cta">
+              <h2>Un chantier comparable ?</h2>
+              <p>FRTP reprend contact après lecture de votre demande.</p>
+              <Link href="/contact">
+                Demander un devis <ArrowRight size={16} />
+              </Link>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section className="project-detail-gallery bg-frtp-mist px-4 pb-14 md:px-6 md:pb-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="project-detail-eyebrow">En images</p>
+              <h2>{galleryImages.length} {photoLabel} du chantier</h2>
+            </div>
+            <p className="text-sm font-semibold text-zinc-500">Cliquez sur une photo pour l'agrandir</p>
+          </div>
+          <GalleryLightbox images={galleryImages} title={project.title} />
         </div>
       </section>
     </article>

@@ -3,6 +3,7 @@ import { defaultBeforeAfterItems, type BeforeAfterItem } from "@/lib/before-afte
 import { activities as fallbackActivities, news as fallbackNews, projects as fallbackProjects } from "@/lib/data";
 import { defaultProjectHeroSettings, normalizeProjectHeroSettingsMap, type ProjectHeroSettings } from "@/lib/project-hero";
 import { defaultStudioSettings, type StudioSettings } from "@/lib/studio";
+import { normalizeCopyObject, normalizeFrenchCopy } from "@/lib/french-copy";
 
 export type SiteProject = (typeof fallbackProjects)[number] & {
   galleryImages?: Array<{
@@ -86,21 +87,21 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
     const image = projectHeroSettings.imageUrl || fallbackImage;
 
     return {
-      title: project.title,
+      title: normalizeFrenchCopy(project.title),
       slug: project.slug,
-      city: project.city ?? "Frejus",
-      category: category?.name ?? "Travaux publics",
-      date: project.work_date ? new Date(project.work_date).getFullYear().toString() : "A venir",
+      city: normalizeFrenchCopy(project.city ?? "Fréjus"),
+      category: normalizeFrenchCopy(category?.name ?? "Travaux publics"),
+      date: project.work_date ? new Date(project.work_date).getFullYear().toString() : "À venir",
       image,
       heroSettings: {
         ...projectHeroSettings,
         imageUrl: image
       },
-      short: project.short_description ?? "Chantier FRTP publie depuis l'administration.",
-      problem: project.initial_problem ?? "Contrainte terrain analysee avant intervention.",
+      short: normalizeFrenchCopy(project.short_description ?? "Chantier FRTP publié depuis l'administration."),
+      problem: normalizeFrenchCopy(project.initial_problem ?? "Contrainte terrain analysée avant intervention."),
       works: project.works_done
-        ? project.works_done.split(/\n|,/).map((item) => item.trim()).filter(Boolean)
-        : ["Preparation", "Execution", "Controle", "Remise en etat"],
+        ? project.works_done.split(/\n|,/).map((item) => normalizeFrenchCopy(item.trim())).filter(Boolean)
+        : ["Préparation", "Exécution", "Contrôle", "Remise en état"],
       galleryImages: orderedImages.map((item) => ({
         url: item.image_url,
         type: item.image_type
@@ -134,10 +135,10 @@ export async function getNewsForSite(): Promise<SiteNews[]> {
   }
 
   return data.map((item) => ({
-    title: item.title,
+    title: normalizeFrenchCopy(item.title),
     slug: item.slug,
-    excerpt: item.excerpt ?? "",
-    content: item.content,
+    excerpt: normalizeFrenchCopy(item.excerpt ?? ""),
+    content: item.content ? normalizeFrenchCopy(item.content) : item.content,
     cover_image_url: item.cover_image_url,
     created_at: item.created_at
   }));
@@ -156,7 +157,7 @@ export async function getActivitiesForSite(): Promise<SiteActivity[]> {
       services: studioActivity?.services?.length ? studioActivity.services : activity.services,
       interventionExample:
         studioActivity?.interventionExample
-        || "Analyse du besoin, reperage des contraintes, organisation des acces, execution des travaux et remise en etat de la zone d'intervention."
+        || "Analyse du besoin, repérage des contraintes, organisation des accès, exécution des travaux et remise en état de la zone d'intervention."
     };
   });
 }
@@ -178,7 +179,7 @@ export async function getBeforeAfterItemsForSite(): Promise<BeforeAfterItem[]> {
     return defaultBeforeAfterItems;
   }
 
-  return (data.value as BeforeAfterItem[])
+  return normalizeCopyObject(data.value as BeforeAfterItem[])
     .filter((item) => item.isPublished)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 }
@@ -200,8 +201,14 @@ export async function getStudioSettings(): Promise<StudioSettings> {
     return defaultStudioSettings;
   }
 
-  return {
+  return normalizeCopyObject({
     ...defaultStudioSettings,
-    ...(data.value as Partial<StudioSettings>)
-  };
+    ...(data.value as Partial<StudioSettings>),
+    address: normalizeStudioAddress((data.value as Partial<StudioSettings>).address)
+  });
+}
+
+function normalizeStudioAddress(value: string | undefined) {
+  const address = value?.trim() || defaultStudioSettings.address;
+  return address.replace(/\bImplantee a\b/i, "Implantée à").replace(/\bImplantée a\b/i, "Implantée à");
 }

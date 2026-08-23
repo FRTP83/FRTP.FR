@@ -11,6 +11,11 @@ export type ContactMailPayload = {
 };
 
 const mailTo = process.env.CONTACT_MAIL_TO || "contact@frtp.fr";
+const resendApiUrl = "https://api.resend.com/emails";
+
+export function isResendConfigured() {
+  return Boolean(process.env.RESEND_API_KEY);
+}
 
 export function isMailConfigured() {
   return Boolean(
@@ -22,6 +27,10 @@ export function isMailConfigured() {
 }
 
 export async function sendContactRequestMail(payload: ContactMailPayload) {
+  if (isResendConfigured()) {
+    return sendWithResend(payload);
+  }
+
   if (!isMailConfigured()) {
     return { skipped: true };
   }
@@ -45,7 +54,31 @@ export async function sendContactRequestMail(payload: ContactMailPayload) {
     html: buildHtmlMail(payload)
   });
 
-  return { skipped: false };
+  return { skipped: false, provider: "smtp" };
+}
+
+async function sendWithResend(payload: ContactMailPayload) {
+  const response = await fetch(resendApiUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM || "FRTP <onboarding@resend.dev>",
+      to: [mailTo],
+      reply_to: payload.email,
+      subject: `Nouvelle demande de contact FRTP - ${payload.city}`,
+      text: buildTextMail(payload),
+      html: buildHtmlMail(payload)
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Resend a refusé l'envoi (${response.status}).`);
+  }
+
+  return { skipped: false, provider: "resend" };
 }
 
 function buildTextMail(payload: ContactMailPayload) {

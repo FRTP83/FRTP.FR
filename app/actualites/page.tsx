@@ -1,38 +1,63 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { SectionHeading } from "@/components/SectionHeading";
+import { ArrowRight, CalendarDays } from "lucide-react";
 import { getNewsForSite, getStudioSettings } from "@/lib/server-data";
+import { buildPageMetadata } from "@/lib/metadata";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Actualités",
-  description: "Actualités et publications de FRTP, entreprise de travaux publics à Fréjus."
-};
+  description: "Actualités, chantiers récents et interventions de FRTP, entreprise de travaux publics à Fréjus.",
+  path: "/actualites"
+});
 
 export default async function NewsPage() {
   const [news, studio] = await Promise.all([getNewsForSite(), getStudioSettings()]);
 
   return (
-    <section className="invert-site bg-white px-4 py-10 md:px-6 md:py-16">
-      <div className="mx-auto max-w-7xl">
-        <SectionHeading
-          eyebrow="Actualites & chantiers"
-          title={studio.newsPageTitle}
-          text={studio.newsPageText}
-        />
-        <div className="mt-8 grid gap-4 md:mt-12 md:grid-cols-2 md:gap-5">
+    <section className="news-index-page bg-frtp-mist">
+      <div className="dark-panel px-4 pb-14 pt-12 text-white md:px-6 md:pb-20 md:pt-18">
+        <div className="mx-auto max-w-7xl">
+          <p className="inline-flex border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-blue-200 md:text-xs md:tracking-[0.24em]">Actualités & chantiers</p>
+          <h1 className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
+            {studio.newsPageTitle}
+          </h1>
+          {studio.newsPageText ? (
+            <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
+              {studio.newsPageText}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="px-4 py-10 md:px-6 md:py-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="news-index-grid">
           {news.map((item) => (
-            <Link data-gsap key={item.slug} href={`/actualites/${item.slug}`} className="group block border border-zinc-200 bg-frtp-gray p-5 transition hover:border-frtp-orange md:p-6">
-              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-frtp-blue md:text-xs md:tracking-[0.24em]">Actualite</p>
-              <h2 className="mt-4 text-xl font-black text-zinc-950 md:text-2xl">{item.title}</h2>
-              <p className="mt-3 text-[15px] leading-7 text-zinc-600 md:text-base">{item.excerpt}</p>
-              <span className="mt-5 inline-flex items-center gap-2 text-sm font-black text-frtp-orange">
+            <Link
+              data-gsap
+              key={item.slug}
+              href={`/actualites/${item.slug}`}
+              className="news-index-card group"
+            >
+              <span className="news-index-card-top">
+                <span>Actualité</span>
+                {item.created_at ? (
+                  <span>
+                    <CalendarDays size={14} />
+                    {new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(item.created_at))}
+                  </span>
+                ) : null}
+              </span>
+              <h2>{item.title}</h2>
+              <p>{item.excerpt}</p>
+              <span className="news-index-link">
                 Lire l'actualite <ArrowRight size={17} className="transition group-hover:translate-x-1" />
               </span>
             </Link>
           ))}
+          </div>
         </div>
       </div>
     </section>

@@ -76,12 +76,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className="font-sans antialiased">
+        <a href="#main-content" className="skip-link">
+          Aller au contenu principal
+        </a>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd()) }}
         />
         <SiteHeader />
-        <main className="pt-20">
+        <main id="main-content" tabIndex={-1} className="site-main">
           <GsapPageEffects>{children}</GsapPageEffects>
         </main>
         <SiteFooter />

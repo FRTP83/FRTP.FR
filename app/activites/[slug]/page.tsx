@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, MapPin } from "lucide-react";
 import { activities } from "@/lib/data";
-import { ProjectCard } from "@/components/ProjectCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { getActivitiesForSite, getProjectsForSite } from "@/lib/server-data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return activities.map((activity) => ({ slug: activity.slug }));
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const activity = siteActivities.find((item) => item.slug === slug);
 
   if (!activity) {
-    return { title: "Activite" };
+    return { title: "Activité" };
   }
 
   return {
@@ -28,7 +28,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     alternates: { canonical: `/activites/${activity.slug}` },
     openGraph: {
       title: `${activity.title} | FRTP`,
-      description: activity.description
+      description: activity.description,
+      url: `/activites/${activity.slug}`,
+      images: [{ url: "/chantier/horizon-hero.jpeg", alt: `${activity.title} - FRTP` }]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${activity.title} | FRTP`,
+      description: activity.description,
+      images: ["/chantier/horizon-hero.jpeg"]
     }
   };
 }
@@ -46,45 +54,101 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
   const related = projects.filter((project) => isProjectRelatedToActivity(project.category, activity.slug, activity.title));
 
   return (
-    <section className="invert-site bg-white px-4 py-10 md:px-6 md:py-16">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start lg:gap-10">
+    <section className="activity-detail-page bg-frtp-mist">
+      <div className="dark-panel px-4 pb-12 pt-12 text-white md:px-6 md:pb-16 md:pt-18">
+        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1fr_0.78fr] md:items-end">
           <div>
-            <Icon size={42} className="text-frtp-blue" />
-            <SectionHeading eyebrow="Activite" title={activity.title} text={activity.description} />
-            <Link href="/contact" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-frtp-orange px-5 py-4 text-sm font-black text-white sm:w-auto md:mt-8">
-              Demander un devis <ArrowRight size={18} />
+            <Link href="/activites" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-zinc-300 transition hover:text-white">
+              <ArrowLeft size={16} />
+              Toutes les activités
             </Link>
+            <div className="mt-8 inline-flex items-center gap-3">
+              <span className="activity-detail-icon">
+                <Icon size={30} />
+              </span>
+              <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.22em] text-blue-200 md:text-xs">
+                Activité
+              </p>
+            </div>
+            <h1 className="mt-5 max-w-4xl font-display text-[2.75rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
+              {activity.title}
+            </h1>
+            <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
+              {activity.description}
+            </p>
           </div>
-          <div className="border border-zinc-200 bg-frtp-gray p-5 md:p-6">
-            <h2 className="text-xl font-black text-zinc-950 md:text-2xl">Prestations realisees</h2>
-            <div className="mt-5 grid gap-3 md:mt-6">
+
+          <aside className="activity-detail-hero-card">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-frtp-orange">Prestations principales</p>
+            <div className="mt-5 grid gap-3">
               {activity.services.map((service) => (
-                <p key={service} className="flex items-start gap-3 text-[15px] font-semibold leading-6 text-zinc-700 md:text-base">
+                <p key={service} className="flex items-start gap-3 text-sm font-bold leading-6 text-zinc-100">
                   <CheckCircle2 size={18} className="text-frtp-orange" />
                   {service}
                 </p>
               ))}
             </div>
-            <h2 className="mt-8 text-xl font-black text-zinc-950 md:text-2xl">Exemples d'interventions</h2>
-            <p className="mt-3 text-[15px] leading-7 text-zinc-600 md:text-base md:leading-8">
-              {activity.interventionExample}
-            </p>
-          </div>
+          </aside>
         </div>
+      </div>
 
-        <div className="mt-12 md:mt-16">
-          <SectionHeading eyebrow="Chantiers associes" title="Quelques references proches de cette activite." />
-          <div className="mt-8 grid gap-5 md:grid-cols-3 md:gap-6">
+      <div className="px-4 py-10 md:px-6 md:py-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="activity-detail-layout">
+            <div className="activity-detail-copy">
+              <SectionHeading eyebrow="Intervention" title="Une intervention cadrée, du repérage à la remise en état." text={activity.interventionExample} />
+              <Link href="/contact" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-frtp-orange px-5 py-4 text-sm font-black text-white transition hover:bg-frtp-orangeDark active:translate-y-px sm:w-auto md:mt-8">
+                Demander un devis <ArrowRight size={18} />
+              </Link>
+            </div>
+
+            <div className="activity-detail-services">
+              <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-blue">Travaux réalisés</p>
+              <div className="mt-6 grid gap-0 sm:grid-cols-2">
+                {activity.services.map((service) => (
+                  <p key={service} className="activity-detail-service">
+                    <CheckCircle2 size={17} />
+                    {service}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 md:mt-16">
+            <SectionHeading eyebrow="Chantiers associés" title="Quelques références proches de cette activité." />
+            <div className="activity-detail-related-grid mt-8 md:mt-10">
             {related.length ? (
               related.map((project) => (
-                <ProjectCard key={project.slug} project={project} />
+                <Link key={project.slug} href={`/realisations/${project.slug}`} className="activity-detail-project group">
+                  <span className="activity-detail-project-image">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover transition duration-500 group-hover:scale-[1.04]"
+                    />
+                    <span className="activity-detail-project-overlay" />
+                    <span className="activity-detail-project-category">{project.category}</span>
+                  </span>
+                  <span className="activity-detail-project-content">
+                    <span className="activity-detail-project-meta">
+                      <span><MapPin size={15} />{project.city}</span>
+                      <span><CalendarDays size={15} />{project.date}</span>
+                    </span>
+                    <span className="activity-detail-project-title">{project.title}</span>
+                    <span className="activity-detail-project-text">{project.short}</span>
+                    <span className="activity-detail-project-link">Voir le chantier <ArrowRight size={17} /></span>
+                  </span>
+                </Link>
               ))
             ) : (
-              <p className="border border-zinc-200 bg-frtp-gray p-5 font-semibold leading-7 text-zinc-600 md:col-span-3">
-                Aucun chantier publie n'est encore lie a cette activite. Ajoutez ou modifiez un chantier dans le Studio, puis choisissez la categorie correspondante.
+              <p className="activity-detail-empty">
+                Aucun chantier publié n'est encore lié à cette activité. Ajoutez ou modifiez un chantier dans le Studio, puis choisissez la catégorie correspondante.
               </p>
             )}
+            </div>
           </div>
         </div>
       </div>

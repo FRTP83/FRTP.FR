@@ -55,7 +55,7 @@ function buildLegalSections(content: string): LegalSection[] {
     }
 
     if (!current) {
-      current = { title: "Informations legales", blocks: [] };
+      current = { title: "Informations légales", blocks: [] };
       sections.push(current);
     }
 
@@ -86,11 +86,23 @@ function isLegalHeading(line: string, nextLine: string, index: number) {
     return false;
   }
 
+  if (line.replace(/[^a-z]/gi, "").toUpperCase() === "FRTP") {
+    return false;
+  }
+
+  if (
+    line.includes(":")
+    || /@|https?:\/\/|www\./i.test(line)
+    || /^(FRTP|SASU|SIREN|RCS|TVA|Siège social|Adresse|Email|Téléphone|Capital social)\b/i.test(line)
+  ) {
+    return false;
+  }
+
   if (index === 0) {
     return true;
   }
 
-  return line.length <= 64 && !/[.:;!?]$/.test(line);
+  return line.length <= 64 && !/[.:;!?]$/.test(line) && nextLine.length > line.length;
 }
 
 function renderInline(text: string): ReactNode[] {

@@ -10,8 +10,8 @@ export const SITE_DESCRIPTION =
 
 export const business = {
   legalName: "FRTP",
-  phone: "+33658017171",
-  phoneDisplay: "06 58 01 71 71",
+  phone: "+33658017271",
+  phoneDisplay: "06 58 01 72 71",
   email: "contact@frtp.fr",
   streetAddress: "51 rue Girardin",
   postalCode: "83600",

@@ -4,6 +4,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 
 export const metadata: Metadata = {
   title: "Administration",
+  alternates: { canonical: "/admin" },
   robots: { index: false, follow: false }
 };
 
@@ -14,6 +15,7 @@ export default function AdminPage() {
         <SectionHeading
           eyebrow="Administration"
           title="Studio de gestion FRTP."
+          level={1}
         />
         <div className="mt-10">
           <AdminConsole />

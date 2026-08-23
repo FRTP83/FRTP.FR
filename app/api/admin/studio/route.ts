@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { defaultStudioSettings, type StudioSettings } from "@/lib/studio";
 import { slugify } from "@/lib/utils";
+import { hasAdminAccess } from "@/lib/admin-access";
+import { normalizeCopyObject } from "@/lib/french-copy";
 
 const imageFields = ["heroImage", "companyImage", "beforeImage", "afterImage"] as const;
 
@@ -24,7 +26,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Session admin invalide." }, { status: 401 });
   }
 
-  const adminAccess = await hasAdminAccess(user.data.user.id);
+  const adminAccess = await hasAdminAccess(user.data.user.id, user.data.user.email);
 
   if (!adminAccess) {
     return NextResponse.json({ error: "Acces non autorise." }, { status: 403 });
@@ -67,7 +69,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Session admin invalide." }, { status: 401 });
   }
 
-  const adminAccess = await hasAdminAccess(user.data.user.id);
+  const adminAccess = await hasAdminAccess(user.data.user.id, user.data.user.email);
 
   if (!adminAccess) {
     return NextResponse.json({ error: "Acces non autorise." }, { status: 403 });
@@ -100,28 +102,15 @@ export async function POST(request: Request) {
     companyTitle: stringValue(formData, "companyTitle", defaultStudioSettings.companyTitle),
     companyIntro: stringValue(formData, "companyIntro", defaultStudioSettings.companyIntro),
     companyImage: current.companyImage ?? defaultStudioSettings.companyImage,
-    companyCards: defaultStudioSettings.companyCards.map((card, index) => ({
-      title: stringValue(formData, `companyCardTitle${index}`, card.title),
-      text: stringValue(formData, `companyCardText${index}`, card.text)
-    })),
+    companyCards: companyCardsValue(formData, current.companyCards ?? defaultStudioSettings.companyCards),
     companyPillars: linesValue(formData, "companyPillars", defaultStudioSettings.companyPillars),
     serviceArea: linesValue(formData, "serviceArea", defaultStudioSettings.serviceArea),
     methodTitle: stringValue(formData, "methodTitle", defaultStudioSettings.methodTitle),
     methodText: stringValue(formData, "methodText", defaultStudioSettings.methodText),
-    methodSteps: defaultStudioSettings.methodSteps.map((step, index) => ({
-      number: stringValue(formData, `methodStepNumber${index}`, step.number),
-      title: stringValue(formData, `methodStepTitle${index}`, step.title),
-      text: stringValue(formData, `methodStepText${index}`, step.text)
-    })),
+    methodSteps: methodStepsValue(formData, current.methodSteps ?? defaultStudioSettings.methodSteps),
     activitiesPageTitle: stringValue(formData, "activitiesPageTitle", defaultStudioSettings.activitiesPageTitle),
     activitiesPageText: stringValue(formData, "activitiesPageText", defaultStudioSettings.activitiesPageText),
-    activities: defaultStudioSettings.activities.map((activity) => ({
-      slug: activity.slug,
-      title: stringValue(formData, `activityTitle-${activity.slug}`, activity.title),
-      description: stringValue(formData, `activityDescription-${activity.slug}`, activity.description),
-      services: linesValue(formData, `activityServices-${activity.slug}`, activity.services),
-      interventionExample: stringValue(formData, `activityIntervention-${activity.slug}`, activity.interventionExample)
-    })),
+    activities: activitiesValue(formData, current.activities ?? defaultStudioSettings.activities),
     projectsPageTitle: stringValue(formData, "projectsPageTitle", defaultStudioSettings.projectsPageTitle),
     projectsPageText: stringValue(formData, "projectsPageText", defaultStudioSettings.projectsPageText),
     newsPageTitle: stringValue(formData, "newsPageTitle", defaultStudioSettings.newsPageTitle),
@@ -137,10 +126,7 @@ export async function POST(request: Request) {
     email: stringValue(formData, "email", defaultStudioSettings.email),
     address: stringValue(formData, "address", defaultStudioSettings.address),
     footerText: stringValue(formData, "footerText", defaultStudioSettings.footerText),
-    stats: defaultStudioSettings.stats.map((stat, index) => ({
-      value: stringValue(formData, `statValue${index}`, stat.value),
-      label: stringValue(formData, `statLabel${index}`, stat.label)
-    })),
+    stats: statsValue(formData, current.stats ?? defaultStudioSettings.stats),
     legalTitle: stringValue(formData, "legalTitle", defaultStudioSettings.legalTitle),
     legalText: stringValue(formData, "legalText", defaultStudioSettings.legalText),
     privacyTitle: stringValue(formData, "privacyTitle", defaultStudioSettings.privacyTitle),
@@ -172,7 +158,7 @@ export async function POST(request: Request) {
 
   const { error } = await supabase.from("site_settings").upsert({
     key: "studio",
-    value: nextSettings,
+    value: normalizeCopyObject(nextSettings),
     updated_at: new Date().toISOString()
   }, { onConflict: "key" });
 
@@ -200,6 +186,71 @@ function linesValue(formData: FormData, key: string, fallback: string[]) {
   return value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
 }
 
+function numberValue(formData: FormData, key: string, fallback: number) {
+  const value = Number(formData.get(key));
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
+function companyCardsValue(formData: FormData, fallback: StudioSettings["companyCards"]) {
+  const length = numberValue(formData, "companyCardsLength", fallback.length);
+
+  return Array.from({ length }).map((_, index) => {
+    const card = fallback[index] ?? { title: "", text: "" };
+
+    return {
+      title: stringValue(formData, `companyCardTitle${index}`, card.title),
+      text: stringValue(formData, `companyCardText${index}`, card.text)
+    };
+  }).filter((card) => card.title || card.text);
+}
+
+function methodStepsValue(formData: FormData, fallback: StudioSettings["methodSteps"]) {
+  const length = numberValue(formData, "methodStepsLength", fallback.length);
+
+  return Array.from({ length }).map((_, index) => {
+    const step = fallback[index] ?? { number: String(index + 1).padStart(2, "0"), title: "", text: "" };
+
+    return {
+      number: stringValue(formData, `methodStepNumber${index}`, step.number),
+      title: stringValue(formData, `methodStepTitle${index}`, step.title),
+      text: stringValue(formData, `methodStepText${index}`, step.text)
+    };
+  }).filter((step) => step.number || step.title || step.text);
+}
+
+function statsValue(formData: FormData, fallback: StudioSettings["stats"]) {
+  const length = numberValue(formData, "statsLength", fallback.length);
+
+  return Array.from({ length }).map((_, index) => {
+    const stat = fallback[index] ?? { value: "", label: "" };
+
+    return {
+      value: stringValue(formData, `statValue${index}`, stat.value),
+      label: stringValue(formData, `statLabel${index}`, stat.label)
+    };
+  }).filter((stat) => stat.value || stat.label);
+}
+
+function activitiesValue(formData: FormData, fallback: StudioSettings["activities"]) {
+  const length = numberValue(formData, "activitiesLength", fallback.length);
+  const fallbackBySlug = new Map([...defaultStudioSettings.activities, ...fallback].map((activity) => [activity.slug, activity]));
+  const slugs = formData.has("activitiesLength")
+    ? Array.from({ length }).map((_, index) => String(formData.get(`activitySlug${index}`) ?? "").trim()).filter(Boolean)
+    : fallback.map((activity) => activity.slug);
+
+  return slugs.map((slug) => {
+    const activity = fallbackBySlug.get(slug) ?? defaultStudioSettings.activities[0];
+
+    return {
+      slug,
+      title: stringValue(formData, `activityTitle-${slug}`, activity.title),
+      description: stringValue(formData, `activityDescription-${slug}`, activity.description),
+      services: linesValue(formData, `activityServices-${slug}`, activity.services),
+      interventionExample: stringValue(formData, `activityIntervention-${slug}`, activity.interventionExample)
+    };
+  }).filter((activity) => activity.slug);
+}
+
 function reviewsValue(formData: FormData) {
   const length = Math.max(0, Number(formData.get("reviewsLength") ?? defaultStudioSettings.reviews.length) || 0);
 
@@ -209,26 +260,4 @@ function reviewsValue(formData: FormData) {
     text: String(formData.get(`reviewText${index}`) ?? "").trim(),
     source: stringValue(formData, `reviewSource${index}`, "Google")
   })).filter((review) => review.text);
-}
-
-async function hasAdminAccess(userId: string) {
-  const supabase = getSupabaseAdmin();
-
-  if (!supabase) return false;
-
-  const { data, error } = await supabase
-    .from("admins")
-    .select("user_id")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (!error) {
-    return Boolean(data);
-  }
-
-  if (error.code === "PGRST205" || error.message.includes("Could not find the table")) {
-    return true;
-  }
-
-  return false;
 }

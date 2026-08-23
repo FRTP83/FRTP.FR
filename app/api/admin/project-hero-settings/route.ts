@@ -5,6 +5,8 @@ import {
   normalizeProjectHeroSettingsMap,
   type ProjectHeroSettingsMap
 } from "@/lib/project-hero";
+import { hasAdminAccess } from "@/lib/admin-access";
+import { normalizeCopyObject } from "@/lib/french-copy";
 
 const settingsKey = "project_hero_settings";
 
@@ -71,7 +73,7 @@ export async function POST(request: Request) {
 
   const { error } = await supabase.from("site_settings").upsert({
     key: settingsKey,
-    value: settingsMap,
+    value: normalizeCopyObject(settingsMap),
     updated_at: new Date().toISOString()
   }, { onConflict: "key" });
 
@@ -95,14 +97,9 @@ async function ensureAccess(request: Request) {
     return { ok: false, status: 401, error: "Session admin invalide." };
   }
 
-  const { data, error } = await supabase
-    .from("admins")
-    .select("user_id")
-    .eq("user_id", user.data.user.id)
-    .maybeSingle();
+  if (!(await hasAdminAccess(user.data.user.id, user.data.user.email))) {
+    return { ok: false, status: 403, error: "Accès non autorisé." };
+  }
 
-  if (!error) return { ok: Boolean(data), status: 403, error: "Acces non autorise." };
-  if (error.code === "PGRST205" || error.message.includes("Could not find the table")) return { ok: true };
-
-  return { ok: false, status: 403, error: "Acces non autorise." };
+  return { ok: true, status: 200, error: "" };
 }
