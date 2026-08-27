@@ -27,6 +27,7 @@ export default async function HomePage() {
             sizes="100vw"
             className="object-cover opacity-[0.72] saturate-[0.95] contrast-[1.03]"
             priority
+            fetchPriority="high"
           />
           <div className="home-hero-blue-filter absolute inset-0" />
           <div className="absolute left-0 top-0 h-36 w-full bg-gradient-to-b from-[#091525]/55 via-[#0d1f38]/18 to-transparent" />
@@ -294,7 +295,7 @@ function RatingStars({ rating, size }: { rating: string; size: number }) {
   const emptyStars = 5 - visibleFullStars - (hasHalfStar ? 1 : 0);
 
   return (
-    <span className="flex gap-1 text-frtp-orange" aria-label={`${rating} sur 5`}>
+    <span className="flex gap-1 text-frtp-orange" role="img" aria-label={`${rating} sur 5`}>
       {Array.from({ length: visibleFullStars }).map((_, index) => (
         <Star key={`full-${index}`} size={size} fill="currentColor" />
       ))}

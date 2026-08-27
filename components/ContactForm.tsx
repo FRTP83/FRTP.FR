@@ -49,6 +49,7 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="contact-form-panel grid gap-5 border border-zinc-200 bg-white p-4 shadow-technical md:p-7">
+      <p className="text-xs font-semibold text-zinc-600"><span aria-hidden="true">*</span> Champs obligatoires</p>
       {/* Champ piège anti-spam : invisible pour les humains, ignoré côté serveur. */}
       <input
         type="text"
@@ -65,8 +66,8 @@ export function ContactForm() {
         <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" maxLength={160} required />
         <Field label="Commune du chantier" name="city" autoComplete="address-level2" maxLength={120} required />
         <label className="grid gap-2 text-sm font-bold text-zinc-800">
-          Type de travaux
-          <select name="work_type" className="contact-field h-12 w-full border px-3 font-normal outline-none">
+          <span>Type de travaux <span aria-hidden="true">*</span></span>
+          <select name="work_type" required className="contact-field h-12 w-full border px-3 font-normal outline-none">
             {contactTypes.map((type) => (
               <option key={type}>{type}</option>
             ))}
@@ -75,7 +76,7 @@ export function ContactForm() {
       </div>
 
       <label className="grid gap-2 text-sm font-bold text-zinc-800">
-        Message
+        <span>Message <span aria-hidden="true">*</span></span>
         <textarea
           name="message"
           required
@@ -87,9 +88,12 @@ export function ContactForm() {
       </label>
 
       <p className="text-xs font-medium leading-6 text-zinc-600">
-        FRTP utilise ces informations uniquement pour répondre à votre demande et préparer votre devis. Consultez notre{" "}
+        FRTP, responsable du traitement, utilise ces informations pour répondre à votre demande et préparer un éventuel devis,
+        sur la base de mesures précontractuelles prises à votre demande. Les demandes sont conservées pendant trois ans après le
+        dernier contact. Vous pouvez exercer vos droits d'accès, de rectification, d'effacement, de limitation et d'opposition à
+        l'adresse contact@frtp.fr. Consultez notre{" "}
         <Link href="/politique-confidentialite" className="font-bold text-frtp-blue underline decoration-frtp-blue/30 underline-offset-4 hover:decoration-frtp-blue">
-          politique de confidentialité
+          politique de confidentialité complète
         </Link>.
       </p>
 
@@ -138,7 +142,7 @@ function Field({
 }) {
   return (
     <label className="grid gap-2 text-sm font-bold text-zinc-800">
-      {label}
+      <span>{label}{required ? <span aria-hidden="true"> *</span> : null}</span>
       <input
         name={name}
         type={type}

@@ -139,16 +139,16 @@ export const stats = [
 
 export const news = [
   {
-    title: "Mise en avant des chantiers récents",
+    title: "Les chantiers récents de FRTP",
     slug: "chantiers-recents",
     excerpt:
-      "Le futur espace admin permettra de publier rapidement les nouveaux chantiers et les photos terrain."
+      "Suivez les dernières interventions de terrassement, VRD et aménagement extérieur réalisées par FRTP."
   },
   {
-    title: "Gestion des photos avant, pendant, après",
+    title: "L'évolution des travaux en images",
     slug: "photos-chantier",
     excerpt:
-      "Chaque réalisation pourra être classée par phase afin de montrer clairement l'évolution des travaux."
+      "Les photos avant, pendant et après permettent de suivre clairement l'évolution de chaque chantier."
   }
 ];
 

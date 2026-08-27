@@ -4,8 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Images, MapPin } from "lucide-react";
 import { GalleryLightbox } from "@/components/GalleryLightbox";
+import { StructuredData } from "@/components/StructuredData";
 import { projects } from "@/lib/data";
 import { getProjectForSite } from "@/lib/server-data";
+import { breadcrumbJsonLd, projectJsonLd } from "@/lib/structured-data";
 
 export const revalidate = 60;
 
@@ -63,6 +65,16 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   return (
     <article className="project-detail-page bg-frtp-mist">
+      <StructuredData
+        data={[
+          breadcrumbJsonLd([
+            { name: "Accueil", path: "/" },
+            { name: "Réalisations", path: "/realisations" },
+            { name: project.title, path: `/realisations/${project.slug}` }
+          ]),
+          projectJsonLd(project)
+        ]}
+      />
       <section data-parallax-section className="project-detail-hero relative min-h-[62dvh] overflow-hidden bg-zinc-950 px-4 pb-16 pt-32 text-white md:min-h-[74dvh] md:px-6 md:pb-20 md:pt-36">
         <Image
           src={heroSettings.imageUrl || project.image}
@@ -108,7 +120,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.45fr_0.55fr] lg:items-start">
           <div data-gsap className="project-detail-copy">
             <p className="project-detail-eyebrow">Le chantier</p>
-            <h2>Problematique initiale</h2>
+            <h2>Problématique initiale</h2>
             <p>{project.problem}</p>
 
             <p className="project-detail-eyebrow mt-10">Travaux réalisés</p>
@@ -129,7 +141,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <strong>{project.city}</strong>
               </div>
               <div>
-                <span>Annee</span>
+                <span>Année</span>
                 <strong>{project.date}</strong>
               </div>
               <div>

@@ -152,7 +152,7 @@ export const defaultStudioSettings: StudioSettings = {
       "Analyse du besoin, repérage des contraintes, organisation des accès, exécution des travaux et remise en état de la zone d'intervention."
   })),
   projectsPageTitle: "Des chantiers présentés par commune, catégorie et intervention.",
-  projectsPageText: "Cette page affiche les chantiers publiés depuis l'espace admin Supabase.",
+  projectsPageText: "Découvrez des chantiers FRTP présentés par commune, métier et type d'intervention.",
   newsPageTitle: "Actualités FRTP.",
   newsPageText: "Retrouvez les dernières informations de l'entreprise, les chantiers récents et les interventions réalisées sur le terrain.",
   beforeAfterTitle: "Montrer le terrain, pas seulement le discours.",
@@ -161,7 +161,7 @@ export const defaultStudioSettings: StudioSettings = {
   beforeImage: "/chantier/bastide-jessica.jpeg",
   afterImage: "/chantier/park-sainte-estelle.jpg",
   contactTitle: "Décrivez votre chantier, FRTP reprend contact.",
-  contactPageText: "Le formulaire enregistre les demandes dans Supabase.",
+  contactPageText: "Présentez votre besoin en quelques lignes : FRTP étudie votre demande et vous recontacte pour préciser le chantier.",
   contactText:
     "Indiquez la commune, le type de travaux, les contraintes d'accès, le niveau d'urgence et les photos disponibles.",
   phone: "06 58 01 72 71",

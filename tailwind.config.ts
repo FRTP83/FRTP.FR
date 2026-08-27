@@ -12,7 +12,7 @@ const config: Config = {
         frtp: {
           blue: "#294F9B",
           blueDark: "#18356F",
-          orange: "#B96812",
+          orange: "#A65300",
           orangeDark: "#874708",
           black: "#121418",
           gray: "#EEF1F3",

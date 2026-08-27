@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, MapPin } from "lucide-react";
 import { activities } from "@/lib/data";
 import { SectionHeading } from "@/components/SectionHeading";
+import { StructuredData } from "@/components/StructuredData";
 import { getActivitiesForSite, getProjectsForSite } from "@/lib/server-data";
+import { breadcrumbJsonLd, serviceJsonLd } from "@/lib/structured-data";
 
 export const revalidate = 60;
 
@@ -23,8 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: activity.title,
-    description: activity.description,
+    title: `${activity.title} à Fréjus et dans le Var`,
+    description: `${activity.description} FRTP intervient à Fréjus, dans le Var et les Alpes-Maritimes.`,
     alternates: { canonical: `/activites/${activity.slug}` },
     openGraph: {
       title: `${activity.title} | FRTP`,
@@ -55,6 +57,16 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
 
   return (
     <section className="activity-detail-page bg-frtp-mist">
+      <StructuredData
+        data={[
+          breadcrumbJsonLd([
+            { name: "Accueil", path: "/" },
+            { name: "Activités", path: "/activites" },
+            { name: activity.title, path: `/activites/${activity.slug}` }
+          ]),
+          serviceJsonLd(activity)
+        ]}
+      />
       <div className="dark-panel px-4 pb-12 pt-12 text-white md:px-6 md:pb-16 md:pt-18">
         <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1fr_0.78fr] md:items-end">
           <div>
@@ -145,7 +157,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
               ))
             ) : (
               <p className="activity-detail-empty">
-                Aucun chantier publié n'est encore lié à cette activité. Ajoutez ou modifiez un chantier dans le Studio, puis choisissez la catégorie correspondante.
+                Aucun chantier n'est encore présenté pour cette activité. Découvrez nos autres réalisations ou contactez FRTP pour parler de votre projet.
               </p>
             )}
             </div>

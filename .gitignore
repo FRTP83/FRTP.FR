@@ -10,4 +10,6 @@ yarn-error.log*
 admin-access-local.txt
 tmp-localhost.*.log
 tmp/
+.playwright-cli/
+output/
 *.tsbuildinfo

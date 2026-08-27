@@ -4,7 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays } from "lucide-react";
 import { RichText } from "@/components/RichText";
+import { StructuredData } from "@/components/StructuredData";
 import { getNewsForSite } from "@/lib/server-data";
+import { articleJsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
 
 export const revalidate = 60;
 
@@ -50,6 +52,16 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
 
   return (
     <article className="bg-frtp-mist text-frtp-graphite">
+      <StructuredData
+        data={[
+          breadcrumbJsonLd([
+            { name: "Accueil", path: "/" },
+            { name: "Actualités", path: "/actualites" },
+            { name: item.title, path: `/actualites/${item.slug}` }
+          ]),
+          articleJsonLd(item)
+        ]}
+      />
       <header className="dark-panel px-4 py-12 text-white md:px-6 md:py-20">
         <div className="mx-auto max-w-5xl">
           <Link href="/actualites" className="inline-flex min-h-11 items-center gap-2 text-sm font-black text-frtp-orange">

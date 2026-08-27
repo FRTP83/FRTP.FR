@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendContactRequestMail } from "@/lib/mail";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { normalizeFrenchCopy } from "@/lib/french-copy";
+import { contactTypes } from "@/lib/data";
 
 const requiredFields = ["name", "phone", "email", "city", "work_type", "message"] as const;
 
@@ -43,6 +44,11 @@ function isRateLimited(ip: string) {
 }
 
 export async function POST(request: Request) {
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(request.url).origin) {
+    return NextResponse.json({ error: "Origine de la demande non autorisée." }, { status: 403 });
+  }
+
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
 
   if (declaredLength > MAX_BODY_BYTES) {
@@ -101,6 +107,10 @@ export async function POST(request: Request) {
 
   if (!emailRegex.test(String(body.email).trim())) {
     return NextResponse.json({ error: "Adresse email invalide." }, { status: 400 });
+  }
+
+  if (!contactTypes.includes(String(body.work_type).trim())) {
+    return NextResponse.json({ error: "Type de travaux invalide." }, { status: 400 });
   }
 
   const supabase = getSupabaseAdmin();
