@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Images, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Images, MapPin } from "lucide-react";
 import { GalleryLightbox } from "@/components/GalleryLightbox";
 import { StructuredData } from "@/components/StructuredData";
 import { projects } from "@/lib/data";
 import { getProjectForSite } from "@/lib/server-data";
 import { breadcrumbJsonLd, projectJsonLd } from "@/lib/structured-data";
 import { activitySlugForCategory } from "@/lib/project-categories";
+import { ProjectWorksList } from "@/components/ProjectWorksList";
 
 export const revalidate = 60;
 
@@ -133,14 +134,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <p>{project.problem}</p>
 
             <p className="project-detail-eyebrow mt-10">Travaux réalisés</p>
-            <div className="project-work-grid mt-4">
-              {project.works.map((work) => (
-                <p key={work}>
-                  <CheckCircle2 size={16} />
-                  {work}
-                </p>
-              ))}
-            </div>
+            <ProjectWorksList works={project.works} />
           </div>
 
           <aside data-gsap className="project-detail-side">
