@@ -1571,6 +1571,10 @@ svg {
   line-height: 1.45;
 }
 
+.project-work-grid p.hidden {
+  display: none;
+}
+
 .project-work-grid svg {
   margin-top: 0.12rem;
   flex: 0 0 auto;
