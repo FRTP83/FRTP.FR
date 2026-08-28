@@ -43,6 +43,7 @@ type ProjectRow = {
   slug: string;
   city: string | null;
   category_id: string | null;
+  project_category_links?: Array<{ category_id: string }>;
   short_description: string | null;
   description: string | null;
   initial_problem: string | null;
@@ -153,7 +154,7 @@ export function AdminConsole() {
       supabase.from("project_categories").select("id,name,slug").order("name"),
       supabase
         .from("projects")
-        .select("id,title,slug,city,category_id,short_description,description,initial_problem,works_done,client_type,work_date,duration,is_published,is_featured,created_at,project_images(id,project_id,image_url,image_type,caption,sort_order)")
+        .select("id,title,slug,city,category_id,short_description,description,initial_problem,works_done,client_type,work_date,duration,is_published,is_featured,created_at,project_category_links(category_id),project_images(id,project_id,image_url,image_type,caption,sort_order)")
         .order("created_at", { ascending: false }),
       supabase.from("news").select("id,title,slug,excerpt,content,cover_image_url,is_published,created_at").order("created_at", { ascending: false }),
       supabase.from("contact_requests").select("id,name,company,email,phone,city,work_type,message,status,created_at").order("created_at", { ascending: false }),
@@ -261,11 +262,12 @@ export function AdminConsole() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     const title = normalizeFrenchCopy(String(formData.get("title")));
+    const categoryIds = formData.getAll("category_ids").map(String).filter(Boolean);
     const payload = {
       title,
       slug: String(formData.get("slug") || slugify(title)),
       city: nullable(formData.get("city")),
-      category_id: nullable(formData.get("category_id")),
+      category_id: categoryIds[0] ?? null,
       short_description: nullable(formData.get("short_description")),
       description: nullable(formData.get("description")),
       initial_problem: nullable(formData.get("initial_problem")),
@@ -285,6 +287,23 @@ export function AdminConsole() {
 
     if (result.error || !result.data) {
       setNotice(result.error?.message ?? "Chantier non enregistré.");
+      setLoading(false);
+      return;
+    }
+
+    const projectId = result.data.id;
+    const { error: deleteCategoryError } = await supabase
+      .from("project_category_links")
+      .delete()
+      .eq("project_id", projectId);
+    const categoryLinkResult = categoryIds.length
+      ? await supabase.from("project_category_links").insert(
+          categoryIds.map((categoryId) => ({ project_id: projectId, category_id: categoryId }))
+        )
+      : { error: null };
+
+    if (deleteCategoryError || categoryLinkResult.error) {
+      setNotice(deleteCategoryError?.message ?? categoryLinkResult.error?.message ?? "Catégories non enregistrées.");
       setLoading(false);
       return;
     }
@@ -1282,13 +1301,26 @@ function ProjectForm({
         <Field label="Slug" name="slug" defaultValue={project?.slug} />
         <Field label="Commune" name="city" defaultValue={project?.city} required />
         <label className="grid gap-2 text-sm font-bold">
-          Catégorie
-          <select name="category_id" defaultValue={project?.category_id ?? ""} className="h-12 border border-zinc-300 bg-white px-3 font-normal outline-none focus:border-frtp-blue">
-            <option value="">Sans catégorie</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>{category.name}</option>
-            ))}
-          </select>
+          Catégories
+          <span className="grid gap-2 border border-zinc-300 bg-white p-3 font-normal">
+            {categories.map((category) => {
+              const selectedIds = project?.project_category_links?.map((link) => link.category_id)
+                ?? (project?.category_id ? [project.category_id] : []);
+              return (
+                <span key={category.id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="category_ids"
+                    value={category.id}
+                    defaultChecked={selectedIds.includes(category.id)}
+                    className="size-4 accent-frtp-blue"
+                  />
+                  {category.name}
+                </span>
+              );
+            })}
+          </span>
+          <span className="text-xs font-normal text-zinc-500">Vous pouvez sélectionner plusieurs catégories.</span>
         </label>
         <Field label="Date chantier" name="work_date" type="date" defaultValue={project?.work_date ?? ""} />
         <Field label="Duree" name="duration" defaultValue={project?.duration} />

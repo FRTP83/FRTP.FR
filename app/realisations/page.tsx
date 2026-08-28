@@ -15,7 +15,9 @@ export default async function ProjectsPage() {
   const [projects, studio] = await Promise.all([getProjectsForSite(), getStudioSettings()]);
   const categoryCounts = Array.from(
     projects.reduce((map, project) => {
-      map.set(project.category, (map.get(project.category) ?? 0) + 1);
+      project.categories.forEach((category) => {
+        map.set(category, (map.get(category) ?? 0) + 1);
+      });
       return map;
     }, new Map<string, number>())
   );

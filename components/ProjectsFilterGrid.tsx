@@ -18,7 +18,7 @@ export function ProjectsFilterGrid({ projects, categoryCounts }: ProjectsFilterG
   const visibleProjects = useMemo(
     () => activeCategory === ALL_PROJECTS
       ? projects
-      : projects.filter((project) => project.category === activeCategory),
+      : projects.filter((project) => project.categories.includes(activeCategory)),
     [activeCategory, projects]
   );
 
@@ -58,7 +58,7 @@ export function ProjectsFilterGrid({ projects, categoryCounts }: ProjectsFilterG
                 className="object-cover transition duration-700 group-hover:scale-[1.04]"
               />
               <span className="projects-index-overlay" />
-              <span className="projects-index-category">{project.category}</span>
+              <span className="projects-index-category">{project.categories.join(" · ")}</span>
             </span>
             <span className="projects-index-content">
               <span className="projects-index-meta">

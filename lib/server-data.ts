@@ -6,6 +6,7 @@ import { defaultStudioSettings, type StudioSettings } from "@/lib/studio";
 import { normalizeCopyObject, normalizeFrenchCopy } from "@/lib/french-copy";
 
 export type SiteProject = (typeof fallbackProjects)[number] & {
+  categories: string[];
   galleryImages?: Array<{
     url: string;
     type: string;
@@ -39,6 +40,9 @@ type ProjectRow = {
   works_done: string | null;
   work_date: string | null;
   project_categories: { name: string | null } | Array<{ name: string | null }> | null;
+  project_category_links: Array<{
+    project_categories: { name: string | null } | Array<{ name: string | null }> | null;
+  }> | null;
   project_images: ProjectImageRow[] | null;
 };
 
@@ -52,7 +56,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id, title, slug, city, short_description, description, initial_problem, works_done, work_date, project_categories(name), project_images(image_url, image_type, sort_order)"
+      "id, title, slug, city, short_description, description, initial_problem, works_done, work_date, project_categories(name), project_category_links(project_categories(name)), project_images(image_url, image_type, sort_order)"
     )
     .eq("is_published", true)
     .order("created_at", { ascending: false });
@@ -74,6 +78,14 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
     const category = Array.isArray(project.project_categories)
       ? project.project_categories[0]
       : project.project_categories;
+    const linkedCategories = (project.project_category_links ?? [])
+      .flatMap((link) => Array.isArray(link.project_categories) ? link.project_categories : [link.project_categories])
+      .map((item) => item?.name)
+      .filter((name): name is string => Boolean(name));
+    const categories = Array.from(new Set([
+      ...linkedCategories,
+      ...(category?.name ? [category.name] : [])
+    ])).map(normalizeFrenchCopy);
     const orderedImages = project.project_images
       ?.slice()
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) ?? [];
@@ -91,6 +103,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
       slug: project.slug,
       city: normalizeFrenchCopy(project.city ?? "Fréjus"),
       category: normalizeFrenchCopy(category?.name ?? "Travaux publics"),
+      categories: categories.length ? categories : ["Travaux publics"],
       date: project.work_date ? new Date(project.work_date).getFullYear().toString() : "À venir",
       image,
       heroSettings: {

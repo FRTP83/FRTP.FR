@@ -37,6 +37,17 @@ create table if not exists public.project_images (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.project_category_links (
+  project_id uuid not null references public.projects(id) on delete cascade,
+  category_id uuid not null references public.project_categories(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (project_id, category_id)
+);
+
+insert into public.project_category_links (project_id, category_id)
+select id, category_id from public.projects where category_id is not null
+on conflict (project_id, category_id) do nothing;
+
 create table if not exists public.news (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -118,6 +129,7 @@ alter table public.admins enable row level security;
 alter table public.project_categories enable row level security;
 alter table public.projects enable row level security;
 alter table public.project_images enable row level security;
+alter table public.project_category_links enable row level security;
 alter table public.news enable row level security;
 alter table public.contact_requests enable row level security;
 alter table public.site_settings enable row level security;
@@ -126,6 +138,7 @@ drop policy if exists "Published projects are public" on public.projects;
 drop policy if exists "Published news are public" on public.news;
 drop policy if exists "Categories are public" on public.project_categories;
 drop policy if exists "Project images are public" on public.project_images;
+drop policy if exists "Project category links are public" on public.project_category_links;
 drop policy if exists "Authenticated users manage projects" on public.projects;
 drop policy if exists "Authenticated users manage project images" on public.project_images;
 drop policy if exists "Authenticated users manage news" on public.news;
@@ -136,6 +149,7 @@ drop policy if exists "Authenticated users update contact requests" on public.co
 drop policy if exists "Service role inserts contact requests" on public.contact_requests;
 drop policy if exists "Admins manage projects" on public.projects;
 drop policy if exists "Admins manage project images" on public.project_images;
+drop policy if exists "Admins manage project category links" on public.project_category_links;
 drop policy if exists "Admins manage news" on public.news;
 drop policy if exists "Admins manage categories" on public.project_categories;
 drop policy if exists "Admins manage site settings" on public.site_settings;
@@ -160,6 +174,10 @@ create policy "Project images are public"
 on public.project_images for select
 using (true);
 
+create policy "Project category links are public"
+on public.project_category_links for select
+using (true);
+
 -- Gestion : réservée aux administrateurs (table public.admins).
 create policy "Admins read admins"
 on public.admins for select
@@ -174,6 +192,12 @@ with check (public.is_admin());
 
 create policy "Admins manage project images"
 on public.project_images for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+create policy "Admins manage project category links"
+on public.project_category_links for all
 to authenticated
 using (public.is_admin())
 with check (public.is_admin());

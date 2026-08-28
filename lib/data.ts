@@ -84,6 +84,7 @@ export const projects = [
     slug: "horizon-croisette",
     city: "Le Cannet",
     category: "Terrassement",
+    categories: ["Terrassement"],
     date: "2026",
     image: "/chantier/horizon-hero.jpeg",
     short:
@@ -97,6 +98,7 @@ export const projects = [
     slug: "bastide-jessica",
     city: "Saint-Raphaël",
     category: "Aménagements extérieurs",
+    categories: ["Aménagements extérieurs", "Terrassement"],
     date: "2026",
     image: "/chantier/bastide-jessica.jpeg",
     short:
@@ -109,6 +111,7 @@ export const projects = [
     slug: "park-sainte-estelle",
     city: "Nice",
     category: "VRD",
+    categories: ["VRD", "Terrassement", "Réseaux"],
     date: "2026",
     image: "/chantier/park-sainte-estelle.jpg",
     short:
@@ -121,6 +124,7 @@ export const projects = [
     slug: "les-chenes",
     city: "Fréjus",
     category: "Réseaux",
+    categories: ["Réseaux", "Terrassement"],
     date: "2025",
     image: "/chantier/les-chenes.jpg",
     short:
