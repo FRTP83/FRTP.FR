@@ -18,7 +18,7 @@ export function ProjectCard({ project }: { project: Project }) {
             className="object-cover transition duration-500 group-hover:scale-[1.04]"
           />
           <div className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] bg-white/92 px-2.5 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-frtp-blue backdrop-blur md:left-4 md:top-4 md:px-3 md:text-xs md:tracking-[0.16em]">
-            {project.category}
+            {project.categories.join(" · ")}
           </div>
         </div>
         <div className="p-4 md:p-5">

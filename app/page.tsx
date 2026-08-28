@@ -193,7 +193,7 @@ export default async function HomePage() {
                   className="object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
                 />
                 <span className="home-project-overlay" />
-                <span className="home-project-category">{project.category}</span>
+                <span className="home-project-category">{project.categories.join(" · ")}</span>
                 <span className="home-project-content">
                   <span className="home-project-city">{project.city} · {project.date}</span>
                   <span className="home-project-title">{project.title}</span>

@@ -46,6 +46,7 @@ export function projectJsonLd(project: {
   image: string;
   city: string;
   category: string;
+  categories?: string[];
   date: string;
 }) {
   return {
@@ -56,7 +57,7 @@ export function projectJsonLd(project: {
     url: `${SITE_URL}/realisations/${project.slug}`,
     image: absoluteUrl(project.image),
     dateCreated: project.date,
-    genre: project.category,
+    genre: project.categories?.length ? project.categories : project.category,
     creator: { "@id": `${SITE_URL}/#business`, name: SITE_NAME },
     contentLocation: {
       "@type": "Place",

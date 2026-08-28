@@ -8,6 +8,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { StructuredData } from "@/components/StructuredData";
 import { getActivitiesForSite, getProjectsForSite } from "@/lib/server-data";
 import { breadcrumbJsonLd, serviceJsonLd } from "@/lib/structured-data";
+import { categoryMatchesActivity } from "@/lib/project-categories";
 
 export const revalidate = 60;
 
@@ -53,7 +54,9 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
   }
 
   const Icon = activity.icon;
-  const related = projects.filter((project) => isProjectRelatedToActivity(project.category, activity.slug, activity.title));
+  const related = projects.filter((project) =>
+    project.categories.some((category) => categoryMatchesActivity(category, activity.slug, activity.title))
+  );
 
   return (
     <section className="activity-detail-page bg-frtp-mist">
@@ -142,7 +145,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
                       className="object-cover transition duration-500 group-hover:scale-[1.04]"
                     />
                     <span className="activity-detail-project-overlay" />
-                    <span className="activity-detail-project-category">{project.category}</span>
+                    <span className="activity-detail-project-category">{project.categories.join(" · ")}</span>
                   </span>
                   <span className="activity-detail-project-content">
                     <span className="activity-detail-project-meta">
@@ -166,33 +169,4 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
       </div>
     </section>
   );
-}
-
-function isProjectRelatedToActivity(projectCategory: string, activitySlug: string, activityTitle: string) {
-  const category = normalize(projectCategory);
-  const title = normalize(activityTitle);
-  const slug = normalize(activitySlug);
-  const aliases: Record<string, string[]> = {
-    terrassement: ["terrassement"],
-    vrd: ["vrd", "voiries reseaux divers"],
-    assainissement: ["assainissement", "eaux usees", "eaux pluviales"],
-    voirie: ["voirie"],
-    reseaux: ["reseaux", "reseaux secs", "reseaux humides", "telecom", "electricite"],
-    "amenagements-exterieurs": ["amenagements exterieurs", "amenagement", "abords"],
-    "demolition-reprise": ["demolition", "reprise"]
-  };
-
-  return [slug, title, ...(aliases[activitySlug] ?? [])].some((candidate) => {
-    const normalizedCandidate = normalize(candidate);
-    return category === normalizedCandidate || category.includes(normalizedCandidate);
-  });
-}
-
-function normalize(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
 }

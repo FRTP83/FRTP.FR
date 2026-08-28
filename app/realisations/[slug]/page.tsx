@@ -8,6 +8,7 @@ import { StructuredData } from "@/components/StructuredData";
 import { projects } from "@/lib/data";
 import { getProjectForSite } from "@/lib/server-data";
 import { breadcrumbJsonLd, projectJsonLd } from "@/lib/structured-data";
+import { activitySlugForCategory } from "@/lib/project-categories";
 
 export const revalidate = 60;
 
@@ -99,9 +100,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <ArrowLeft size={15} />
             Tous les chantiers
           </Link>
-          <p data-hero-line className="inline-flex w-fit bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-orange backdrop-blur md:text-xs md:tracking-[0.26em]">
-            {project.category}
-          </p>
+          <div data-hero-line className="flex flex-wrap gap-2">
+            {project.categories.map((category) => {
+              const activitySlug = activitySlugForCategory(category);
+              const className = "inline-flex w-fit bg-white/10 px-3 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-orange backdrop-blur transition hover:bg-white/20 md:text-xs md:tracking-[0.26em]";
+              return activitySlug ? (
+                <Link key={category} href={`/activites/${activitySlug}`} className={className}>{category}</Link>
+              ) : (
+                <span key={category} className={className}>{category}</span>
+              );
+            })}
+          </div>
           <h1 data-hero-line className="mt-4 max-w-4xl text-balance font-display text-[2.4rem] font-bold leading-[0.98] tracking-tight md:text-6xl lg:text-7xl">
             {project.title}
           </h1>
