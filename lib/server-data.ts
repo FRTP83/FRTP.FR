@@ -1,4 +1,4 @@
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
+import { getSupabaseAdmin, isSupabaseConfigured, supabase as publicSupabase } from "@/lib/supabase";
 import { defaultBeforeAfterItems, type BeforeAfterItem } from "@/lib/before-after";
 import { activities as fallbackActivities, news as fallbackNews, projects as fallbackProjects } from "@/lib/data";
 import { defaultProjectHeroSettings, normalizeProjectHeroSettingsMap, type ProjectHeroSettings } from "@/lib/project-hero";
@@ -48,7 +48,7 @@ type ProjectCategoryLinkRow = {
 };
 
 export async function getProjectsForSite(): Promise<SiteProject[]> {
-  const supabase = getSupabaseAdmin();
+  const supabase = getSupabaseAdmin() ?? publicSupabase;
 
   if (!isSupabaseConfigured || !supabase) {
     return fallbackProjects;
@@ -147,7 +147,7 @@ export async function getProjectForSite(slug: string): Promise<SiteProject | nul
 }
 
 export async function getNewsForSite(): Promise<SiteNews[]> {
-  const supabase = getSupabaseAdmin();
+  const supabase = getSupabaseAdmin() ?? publicSupabase;
 
   if (!isSupabaseConfigured || !supabase) {
     return fallbackNews;
@@ -192,7 +192,7 @@ export async function getActivitiesForSite(): Promise<SiteActivity[]> {
 }
 
 export async function getBeforeAfterItemsForSite(): Promise<BeforeAfterItem[]> {
-  const supabase = getSupabaseAdmin();
+  const supabase = getSupabaseAdmin() ?? publicSupabase;
 
   if (!isSupabaseConfigured || !supabase) {
     return defaultBeforeAfterItems;
@@ -214,7 +214,7 @@ export async function getBeforeAfterItemsForSite(): Promise<BeforeAfterItem[]> {
 }
 
 export async function getStudioSettings(): Promise<StudioSettings> {
-  const supabase = getSupabaseAdmin();
+  const supabase = getSupabaseAdmin() ?? publicSupabase;
 
   if (!isSupabaseConfigured || !supabase) {
     return defaultStudioSettings;
