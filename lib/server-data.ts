@@ -40,10 +40,12 @@ type ProjectRow = {
   works_done: string | null;
   work_date: string | null;
   project_categories: { name: string | null } | Array<{ name: string | null }> | null;
-  project_category_links: Array<{
-    project_categories: { name: string | null } | Array<{ name: string | null }> | null;
-  }> | null;
   project_images: ProjectImageRow[] | null;
+};
+
+type ProjectCategoryLinkRow = {
+  project_id: string;
+  project_categories: { name: string | null } | Array<{ name: string | null }> | null;
 };
 
 export async function getProjectsForSite(): Promise<SiteProject[]> {
@@ -56,13 +58,30 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id, title, slug, city, short_description, description, initial_problem, works_done, work_date, project_categories(name), project_category_links(project_categories(name)), project_images(image_url, image_type, sort_order)"
+      "id, title, slug, city, short_description, description, initial_problem, works_done, work_date, project_categories(name), project_images(image_url, image_type, sort_order)"
     )
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
   if (error || !data?.length) {
     return fallbackProjects;
+  }
+
+  const projectIds = data.map((project) => project.id);
+  const categoryLinksResult = await supabase
+    .from("project_category_links")
+    .select("project_id, project_categories(name)")
+    .in("project_id", projectIds);
+  const categoriesByProject = new Map<string, string[]>();
+
+  if (!categoryLinksResult.error) {
+    (categoryLinksResult.data as unknown as ProjectCategoryLinkRow[]).forEach((link) => {
+      const linked = Array.isArray(link.project_categories)
+        ? link.project_categories
+        : [link.project_categories];
+      const names = linked.map((item) => item?.name).filter((name): name is string => Boolean(name));
+      categoriesByProject.set(link.project_id, [...(categoriesByProject.get(link.project_id) ?? []), ...names]);
+    });
   }
 
   const heroSettingsResult = await supabase
@@ -78,10 +97,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
     const category = Array.isArray(project.project_categories)
       ? project.project_categories[0]
       : project.project_categories;
-    const linkedCategories = (project.project_category_links ?? [])
-      .flatMap((link) => Array.isArray(link.project_categories) ? link.project_categories : [link.project_categories])
-      .map((item) => item?.name)
-      .filter((name): name is string => Boolean(name));
+    const linkedCategories = categoriesByProject.get(project.id) ?? [];
     const categories = Array.from(new Set([
       ...linkedCategories,
       ...(category?.name ? [category.name] : [])
