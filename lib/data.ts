@@ -78,61 +78,21 @@ export const activities = [
   }
 ];
 
-export const projects = [
-  {
-    title: "Confortement et reprise de talus",
-    slug: "horizon-croisette",
-    city: "Le Cannet",
-    category: "Terrassement",
-    categories: ["Terrassement"],
-    date: "2026",
-    image: "/chantier/horizon-hero.jpeg",
-    short:
-      "Intervention de terrassement et sécurisation de zone avec accès contraint et suivi technique.",
-    problem:
-      "Zone fragilisée avec besoin de remise en sécurité rapide et de maintien des circulations.",
-    works: ["Préparation de l'accès", "Terrassement par zones", "Évacuation des matériaux", "Nettoyage de fin d'intervention"]
-  },
-  {
-    title: "Reprise d'abords de villa",
-    slug: "bastide-jessica",
-    city: "Saint-Raphaël",
-    category: "Aménagements extérieurs",
-    categories: ["Aménagements extérieurs", "Terrassement"],
-    date: "2026",
-    image: "/chantier/bastide-jessica.jpeg",
-    short:
-      "Travaux extérieurs autour d'une habitation avec préparation de support et remise en état.",
-    problem: "Abords déformés et zones à reprendre avant finitions.",
-    works: ["Décaissement", "Préparation de fond de forme", "Reprise des niveaux", "Finitions de chantier"]
-  },
-  {
-    title: "Cheminement piéton et VRD",
-    slug: "park-sainte-estelle",
-    city: "Nice",
-    category: "VRD",
-    categories: ["VRD", "Terrassement", "Réseaux"],
-    date: "2026",
-    image: "/chantier/park-sainte-estelle.jpg",
-    short:
-      "Création de cheminement et intervention VRD en site occupé pour habitat collectif.",
-    problem: "Besoin d'un cheminement propre, lisible et durable en résidence.",
-    works: ["Implantation", "Terrassement", "Pose de réseaux", "Remise en circulation"]
-  },
-  {
-    title: "Intervention réseau télécom",
-    slug: "les-chenes",
-    city: "Fréjus",
-    category: "Réseaux",
-    categories: ["Réseaux", "Terrassement"],
-    date: "2025",
-    image: "/chantier/les-chenes.jpg",
-    short:
-      "Recherche, reprise et protection de réseau télécom sur zone de travaux publics.",
-    problem: "Réseau sensible identifié pendant intervention.",
-    works: ["Ouverture soignée", "Identification réseau", "Protection", "Réfection de surface"]
-  }
-];
+export type Project = {
+  title: string;
+  slug: string;
+  city: string;
+  category: string;
+  categories: string[];
+  date: string;
+  image: string;
+  short: string;
+  problem: string;
+  works: string[];
+};
+
+// Les réalisations publiques proviennent exclusivement de Supabase.
+export const projects: Project[] = [];
 
 export const stats = [
   { value: "83", label: "Var, secteur principal" },
