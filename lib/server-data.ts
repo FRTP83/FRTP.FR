@@ -39,13 +39,12 @@ type ProjectRow = {
   initial_problem: string | null;
   works_done: string | null;
   work_date: string | null;
-  project_categories: { name: string | null } | Array<{ name: string | null }> | null;
-  project_images: ProjectImageRow[] | null;
+  category_id: string | null;
 };
 
 type ProjectCategoryLinkRow = {
   project_id: string;
-  project_categories: { name: string | null } | Array<{ name: string | null }> | null;
+  category_id: string;
 };
 
 export async function getProjectsForSite(): Promise<SiteProject[]> {
@@ -58,7 +57,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id, title, slug, city, short_description, description, initial_problem, works_done, work_date, project_categories(name), project_images(image_url, image_type, sort_order)"
+      "id, title, slug, city, short_description, description, initial_problem, works_done, work_date, category_id"
     )
     .eq("is_published", true)
     .order("created_at", { ascending: false });
@@ -68,21 +67,22 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
   }
 
   const projectIds = data.map((project) => project.id);
-  const categoryLinksResult = await supabase
-    .from("project_category_links")
-    .select("project_id, project_categories(name)")
-    .in("project_id", projectIds);
-  const categoriesByProject = new Map<string, string[]>();
+  const [categoryLinksResult, categoriesResult, imagesResult] = await Promise.all([
+    supabase.from("project_category_links").select("project_id, category_id").in("project_id", projectIds),
+    supabase.from("project_categories").select("id, name"),
+    supabase.from("project_images").select("project_id, image_url, image_type, sort_order").in("project_id", projectIds)
+  ]);
+  const categoryNameById = new Map((categoriesResult.data ?? []).map((item) => [item.id, item.name]));
+  const categoryIdsByProject = new Map<string, string[]>();
+  const imagesByProject = new Map<string, ProjectImageRow[]>();
 
-  if (!categoryLinksResult.error) {
-    (categoryLinksResult.data as unknown as ProjectCategoryLinkRow[]).forEach((link) => {
-      const linked = Array.isArray(link.project_categories)
-        ? link.project_categories
-        : [link.project_categories];
-      const names = linked.map((item) => item?.name).filter((name): name is string => Boolean(name));
-      categoriesByProject.set(link.project_id, [...(categoriesByProject.get(link.project_id) ?? []), ...names]);
-    });
-  }
+  (categoryLinksResult.data as ProjectCategoryLinkRow[] | null)?.forEach((link) => {
+    categoryIdsByProject.set(link.project_id, [...(categoryIdsByProject.get(link.project_id) ?? []), link.category_id]);
+  });
+  (imagesResult.data ?? []).forEach((image) => {
+    const row = { image_url: image.image_url, image_type: image.image_type, sort_order: image.sort_order };
+    imagesByProject.set(image.project_id, [...(imagesByProject.get(image.project_id) ?? []), row]);
+  });
 
   const heroSettingsResult = await supabase
     .from("site_settings")
@@ -94,15 +94,15 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
     : normalizeProjectHeroSettingsMap(heroSettingsResult.data?.value);
 
   return (data as unknown as ProjectRow[]).map((project) => {
-    const category = Array.isArray(project.project_categories)
-      ? project.project_categories[0]
-      : project.project_categories;
-    const linkedCategories = categoriesByProject.get(project.id) ?? [];
+    const primaryCategory = project.category_id ? categoryNameById.get(project.category_id) : null;
+    const linkedCategories = (categoryIdsByProject.get(project.id) ?? [])
+      .map((categoryId) => categoryNameById.get(categoryId))
+      .filter((name): name is string => Boolean(name));
     const categories = Array.from(new Set([
       ...linkedCategories,
-      ...(category?.name ? [category.name] : [])
+      ...(primaryCategory ? [primaryCategory] : [])
     ])).map(normalizeFrenchCopy);
-    const orderedImages = project.project_images
+    const orderedImages = imagesByProject.get(project.id)
       ?.slice()
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) ?? [];
     const projectHeroSettings = {
@@ -118,7 +118,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
       title: normalizeFrenchCopy(project.title),
       slug: project.slug,
       city: normalizeFrenchCopy(project.city ?? "Fréjus"),
-      category: normalizeFrenchCopy(category?.name ?? "Travaux publics"),
+      category: normalizeFrenchCopy(primaryCategory ?? categories[0] ?? "Travaux publics"),
       categories: categories.length ? categories : ["Travaux publics"],
       date: project.work_date ? new Date(project.work_date).getFullYear().toString() : "À venir",
       image,
