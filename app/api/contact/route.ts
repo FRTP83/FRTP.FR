@@ -26,6 +26,31 @@ const RATE_WINDOW_MS = 10 * 60 * 1000;
 const MAX_BODY_BYTES = 16_000;
 const hits = new Map<string, number[]>();
 
+function isAllowedOrigin(request: Request, origin: string) {
+  try {
+    const originUrl = new URL(origin);
+    const requestUrl = new URL(request.url);
+    const configuredUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.frtp.fr");
+    const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+    const host = request.headers.get("host")?.split(",")[0]?.trim();
+    const configuredHost = configuredUrl.host.toLowerCase();
+    const configuredApex = configuredHost.replace(/^www\./, "");
+
+    const allowedHosts = new Set([
+      requestUrl.host,
+      forwardedHost,
+      host,
+      configuredHost,
+      configuredApex,
+      `www.${configuredApex}`
+    ].filter(Boolean).map((value) => String(value).toLowerCase()));
+
+    return allowedHosts.has(originUrl.host.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
 function isRateLimited(ip: string) {
   const now = Date.now();
 
@@ -45,7 +70,7 @@ function isRateLimited(ip: string) {
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) {
+  if (origin && !isAllowedOrigin(request, origin)) {
     return NextResponse.json({ error: "Origine de la demande non autorisée." }, { status: 403 });
   }
 
