@@ -82,22 +82,7 @@ export default async function HomePage() {
       </section>
 
       <div className="invert-site">
-      <section className="home-stats-light section-light border-b border-zinc-200 bg-frtp-mist">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 px-4 md:grid-cols-4 md:px-6">
-          {studio.stats.map((stat, index) => (
-            <div
-              data-gsap
-              key={stat.label}
-              className={`py-5 md:py-7 ${index % 2 === 1 ? "border-l border-zinc-200 pl-4 md:pl-0" : ""} ${index > 1 ? "border-t border-zinc-200 md:border-t-0" : ""} ${index > 0 ? "md:border-l md:border-zinc-200 md:pl-6" : ""}`}
-            >
-              <p className="font-mono text-2xl font-black text-frtp-blue md:text-3xl">{stat.value}</p>
-              <p className="mt-2 text-xs font-semibold leading-5 text-zinc-600 md:text-sm">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="method-terrain-dark section-dark border-y border-white/10 px-4 py-14 text-white md:px-6 md:py-24">
+      <section className="method-terrain-dark section-dark section-inverted-light border-y border-white/10 px-4 py-14 text-white md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
           <div data-gsap className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">Méthode terrain</p>
@@ -123,7 +108,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-activities-light section-light bg-frtp-mist px-4 py-10 md:px-6 md:py-14">
+      <section className="home-activities-light section-light section-inverted-dark bg-frtp-mist px-4 py-10 md:px-6 md:py-14">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Activités"
@@ -165,7 +150,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-projects-dark section-dark technical-grid bg-frtp-gray px-4 py-12 md:px-6 md:py-20">
+      <section className="home-projects-dark section-dark section-inverted-light technical-grid bg-frtp-gray px-4 py-12 md:px-6 md:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <SectionHeading
@@ -208,7 +193,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-before-after-light section-light bg-frtp-mist px-4 py-12 md:px-6 md:py-20">
+      <section className="home-before-after-light section-light section-inverted-dark bg-frtp-mist px-4 py-12 md:px-6 md:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <div>
             <SectionHeading
@@ -228,7 +213,7 @@ export default async function HomePage() {
       </section>
 
       {studio.reviews.length > 0 ? (
-      <section className="home-reviews-dark section-dark metal-surface border-y border-zinc-200 px-4 py-12 md:px-6 md:py-20">
+      <section className="home-reviews-dark section-dark section-inverted-light metal-surface border-y border-zinc-200 px-4 py-12 md:px-6 md:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
             <div>
@@ -267,7 +252,7 @@ export default async function HomePage() {
       </section>
       ) : null}
 
-      <section className="home-cta-light section-light px-4 py-12 md:px-6 md:py-16">
+      <section className="home-cta-light section-light section-inverted-dark px-4 py-12 md:px-6 md:py-16">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-8 md:flex-row md:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">Contact rapide</p>

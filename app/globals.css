@@ -1774,6 +1774,65 @@ svg {
   background: rgba(255, 255, 255, 0.36) !important;
 }
 
+/* Inversion volontaire des surfaces centrales de la page d'accueil. */
+.invert-site .section-inverted-light {
+  background: linear-gradient(180deg, #f6f8f9 0%, #ffffff 100%) !important;
+  color: #121418 !important;
+}
+
+.invert-site .section-inverted-light .text-white,
+.invert-site .section-inverted-light .text-zinc-950,
+.invert-site .section-inverted-light .text-zinc-900,
+.invert-site .section-inverted-light .text-zinc-800,
+.invert-site .section-inverted-light .text-frtp-graphite {
+  color: #121418 !important;
+}
+
+.invert-site .section-inverted-light .text-zinc-700,
+.invert-site .section-inverted-light .text-zinc-600,
+.invert-site .section-inverted-light .text-zinc-500,
+.invert-site .section-inverted-light .text-zinc-400,
+.invert-site .section-inverted-light .text-zinc-300 {
+  color: #3e4652 !important;
+}
+
+.invert-site .section-inverted-light .text-frtp-blue,
+.invert-site .section-inverted-light .text-frtp-blueDark {
+  color: #294f9b !important;
+}
+
+.invert-site .section-inverted-light .bg-white,
+.invert-site .section-inverted-light .bg-white\/92,
+.invert-site .section-inverted-light .bg-white\/95 {
+  background-color: #ffffff !important;
+  color: #121418 !important;
+}
+
+.invert-site .section-inverted-dark {
+  background: var(--frtp-dark-surface) !important;
+  color: #f6f8f9 !important;
+}
+
+.invert-site .section-inverted-dark .text-zinc-950,
+.invert-site .section-inverted-dark .text-zinc-900,
+.invert-site .section-inverted-dark .text-zinc-800,
+.invert-site .section-inverted-dark .text-frtp-graphite {
+  color: #f6f8f9 !important;
+}
+
+.invert-site .section-inverted-dark .text-zinc-700,
+.invert-site .section-inverted-dark .text-zinc-600,
+.invert-site .section-inverted-dark .text-zinc-500 {
+  color: #cfd7e2 !important;
+}
+
+.invert-site .section-inverted-dark .bg-white,
+.invert-site .section-inverted-dark .bg-white\/92,
+.invert-site .section-inverted-dark .bg-white\/95 {
+  background-color: rgba(255, 255, 255, 0.045) !important;
+  color: #f6f8f9 !important;
+}
+
 .home-activities-list {
   border-bottom: 1px solid rgba(18, 20, 24, 0.16);
 }
