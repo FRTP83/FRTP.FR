@@ -82,29 +82,26 @@ export default async function HomePage() {
       </section>
 
       <div className="invert-site">
-      <section className="method-terrain-dark section-dark section-inverted-light border-y border-white/10 px-4 py-14 text-white md:px-6 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div data-gsap className="max-w-3xl">
+      <section className="method-terrain-dark section-dark section-inverted-light border-y border-white/10 px-4 py-8 text-white md:px-6 md:py-10">
+        <div className="method-route mx-auto max-w-7xl">
+          <div data-gsap className="method-route-intro">
             <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">Méthode terrain</p>
-            <h2 className="mt-4 max-w-2xl text-[2rem] font-black leading-tight tracking-tight text-white md:text-5xl">
+            <h2 className="mt-3 max-w-2xl text-[1.8rem] font-black leading-[1.02] tracking-tight text-white md:text-4xl">
               {studio.methodTitle}
             </h2>
-            <p className="mt-5 max-w-2xl text-[15px] font-medium leading-7 text-zinc-300 md:text-base md:leading-8">
-              {studio.methodText}
-            </p>
           </div>
-          <div className="method-steps-grid mt-12 grid gap-0 md:mt-16 md:grid-cols-4">
+          <ol className="method-route-list">
             {studio.methodSteps.map(({ number, title, text }) => (
-              <article data-gsap key={title} className="method-step-item">
-                <div className="method-step-number-row">
-                  <p className="font-mono text-3xl font-medium text-frtp-blue md:text-4xl">{number}</p>
-                  <span aria-hidden="true" />
-                </div>
-                <h3 className="mt-6 text-lg font-black text-white md:text-xl">{title}</h3>
-                <p className="mt-4 max-w-[17rem] text-sm font-medium leading-7 text-zinc-300">{text}</p>
-              </article>
+              <li data-gsap key={title} className="method-route-step">
+                <span className="method-route-number">{number}</span>
+                <span className="method-route-line" aria-hidden="true" />
+                <article>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </article>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
