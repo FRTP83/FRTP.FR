@@ -6,7 +6,7 @@ import { GsapPageEffects } from "@/components/GsapPageEffects";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StructuredData } from "@/components/StructuredData";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, localBusinessJsonLd } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, localBusinessJsonLd, websiteJsonLd } from "@/lib/site";
 
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -91,7 +91,7 @@ gtag('config', 'G-04GS2W23LZ');`}
         <a href="#main-content" className="skip-link">
           Aller au contenu principal
         </a>
-        <StructuredData data={localBusinessJsonLd()} />
+        <StructuredData data={[localBusinessJsonLd(), websiteJsonLd()]} />
         <SiteHeader />
         <main id="main-content" tabIndex={-1} className="site-main">
           <GsapPageEffects>{children}</GsapPageEffects>

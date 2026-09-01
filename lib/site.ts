@@ -30,6 +30,7 @@ export function localBusinessJsonLd() {
     "@type": "GeneralContractor",
     "@id": `${SITE_URL}/#business`,
     name: SITE_NAME,
+    alternateName: "FRTP Fréjus",
     legalName: business.legalName,
     url: SITE_URL,
     image: `${SITE_URL}/brand/frtp-logo.png`,
@@ -52,6 +53,11 @@ export function localBusinessJsonLd() {
     areaServed: business.areaServed.map((name) => ({ "@type": "AdministrativeArea", name })),
     description: SITE_DESCRIPTION,
     vatID: "FR03980664080",
+    identifier: {
+      "@type": "PropertyValue",
+      propertyID: "SIREN",
+      value: "980664080"
+    },
     knowsAbout: [
       "Terrassement",
       "VRD",
@@ -61,5 +67,20 @@ export function localBusinessJsonLd() {
       "Aménagements extérieurs",
       "Démolition"
     ]
+  };
+}
+
+// Aide Google à identifier clairement le nom du site malgré l'acronyme FRTP.
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: SITE_NAME,
+    alternateName: "FRTP Fréjus",
+    description: SITE_DESCRIPTION,
+    publisher: { "@id": `${SITE_URL}/#business` },
+    inLanguage: "fr-FR"
   };
 }
