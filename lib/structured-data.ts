@@ -1,4 +1,5 @@
 import { SITE_NAME, SITE_URL, business } from "@/lib/site";
+import type { ActivityFaq } from "@/lib/activity-seo";
 
 export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
   return {
@@ -36,6 +37,18 @@ export function serviceJsonLd(activity: {
         itemOffered: { "@type": "Service", name }
       }))
     }
+  };
+}
+
+export function faqJsonLd(items: ActivityFaq[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer }
+    }))
   };
 }
 

@@ -9,6 +9,8 @@ import { StructuredData } from "@/components/StructuredData";
 import { getActivitiesForSite, getProjectsForSite } from "@/lib/server-data";
 import { breadcrumbJsonLd, serviceJsonLd } from "@/lib/structured-data";
 import { categoryMatchesActivity } from "@/lib/project-categories";
+import { getActivitySeo } from "@/lib/activity-seo";
+import { faqJsonLd } from "@/lib/structured-data";
 
 export const revalidate = 60;
 
@@ -54,6 +56,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
   }
 
   const Icon = activity.icon;
+  const seo = getActivitySeo(activity.slug);
   const related = projects.filter((project) =>
     project.categories.some((category) => categoryMatchesActivity(category, activity.slug, activity.title))
   );
@@ -67,7 +70,8 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
             { name: "Activités", path: "/activites" },
             { name: activity.title, path: `/activites/${activity.slug}` }
           ]),
-          serviceJsonLd(activity)
+          serviceJsonLd(activity),
+          ...(seo ? [faqJsonLd(seo.faqs)] : [])
         ]}
       />
       <div className="dark-panel px-4 pb-12 pt-12 text-white md:px-6 md:pb-16 md:pt-18">
@@ -129,6 +133,32 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
               </div>
             </div>
           </div>
+
+          {seo ? (
+            <section className="mt-12 border-t border-zinc-200 pt-10 md:mt-16 md:pt-14">
+              <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+                <div>
+                  <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-blue">FRTP près de chez vous</p>
+                  <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-zinc-950 md:text-4xl">{activity.title} à Fréjus et dans le Var</h2>
+                  <p className="mt-5 text-base font-medium leading-8 text-zinc-700">{seo.localIntro}</p>
+                  <Link href="/contact" className="mt-6 inline-flex items-center gap-2 font-black text-frtp-blue">
+                    Étudier votre chantier <ArrowRight size={18} />
+                  </Link>
+                </div>
+                <div>
+                  <h2 className="font-display text-2xl font-bold text-zinc-950 md:text-3xl">Questions fréquentes</h2>
+                  <div className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
+                    {seo.faqs.map((item) => (
+                      <details key={item.question} className="group py-5">
+                        <summary className="cursor-pointer list-none pr-6 text-base font-black text-zinc-950">{item.question}</summary>
+                        <p className="mt-3 max-w-3xl text-sm font-medium leading-7 text-zinc-600">{item.answer}</p>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          ) : null}
 
           <div className="mt-12 md:mt-16">
             <SectionHeading eyebrow="Chantiers associés" title="Quelques références proches de cette activité." />
