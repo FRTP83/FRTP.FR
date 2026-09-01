@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
+import Script from "next/script";
 import "@/app/globals.css";
 import { GsapPageEffects } from "@/components/GsapPageEffects";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -76,6 +77,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-04GS2W23LZ"
+        strategy="beforeInteractive"
+      />
+      <Script id="google-tag" strategy="beforeInteractive">
+        {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-04GS2W23LZ');`}
+      </Script>
       <body className="font-sans antialiased">
         <a href="#main-content" className="skip-link">
           Aller au contenu principal
