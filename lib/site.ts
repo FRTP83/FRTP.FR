@@ -1,7 +1,10 @@
 // Informations centrales du site, réutilisées pour le SEO, le sitemap,
 // les données structurées et le footer.
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.frtp.fr").replace(/\/$/, "");
+// Netlify sert frtp.fr comme domaine principal et redirige www.frtp.fr vers celui-ci.
+// La référence canonique doit donc rester identique dans les métadonnées, le sitemap
+// et les données structurées, indépendamment des variables d'environnement du build.
+export const SITE_URL = "https://frtp.fr";
 
 export const SITE_NAME = "FRTP";
 
