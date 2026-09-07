@@ -3,3 +3,27 @@ command = "npm run build"
 
 [build.environment]
 NODE_VERSION = "22"
+
+[[redirects]]
+from = "http://frtp83.fr/*"
+to = "https://frtp.fr/:splat"
+status = 301
+force = true
+
+[[redirects]]
+from = "https://frtp83.fr/*"
+to = "https://frtp.fr/:splat"
+status = 301
+force = true
+
+[[redirects]]
+from = "http://www.frtp83.fr/*"
+to = "https://frtp.fr/:splat"
+status = 301
+force = true
+
+[[redirects]]
+from = "https://www.frtp83.fr/*"
+to = "https://frtp.fr/:splat"
+status = 301
+force = true
