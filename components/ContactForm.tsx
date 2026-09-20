@@ -31,11 +31,7 @@ export function ContactForm() {
       if (response.ok) {
         form.reset();
         setState("success");
-        setMessage(
-          data?.mailError
-            ? "Votre demande a bien été enregistrée. L'email de notification doit encore être configuré."
-            : "Votre demande a bien été envoyée."
-        );
+        setMessage("Votre demande a bien été enregistrée. FRTP vous recontactera à partir des coordonnées indiquées.");
         return;
       }
 

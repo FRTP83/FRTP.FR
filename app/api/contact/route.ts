@@ -142,7 +142,7 @@ export async function POST(request: Request) {
 
   if (!supabase) {
     return NextResponse.json(
-      { error: "Supabase n'est pas encore configuré pour enregistrer la demande." },
+      { error: "Le formulaire est temporairement indisponible. Contactez-nous à contact@frtp.fr ou au 06 58 01 72 71." },
       { status: 503 }
     );
   }
