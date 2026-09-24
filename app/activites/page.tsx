@@ -23,11 +23,6 @@ export default async function ActivitiesPage() {
           <h1 className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
             {studio.activitiesPageTitle}
           </h1>
-          {studio.activitiesPageText ? (
-            <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
-              {studio.activitiesPageText}
-            </p>
-          ) : null}
         </div>
       </div>
 

@@ -29,6 +29,9 @@ export async function SiteFooter() {
             <Link href="/mentions-legales" className="inline-flex min-h-11 items-center text-zinc-200 transition hover:text-white">
               Mentions légales
             </Link>
+            <Link href="/zones-intervention" className="inline-flex min-h-11 items-center text-zinc-200 transition hover:text-white">
+              Zones d'intervention
+            </Link>
             <Link href="/politique-confidentialite" className="inline-flex min-h-11 items-center text-zinc-200 transition hover:text-white">
               Politique de confidentialité
             </Link>

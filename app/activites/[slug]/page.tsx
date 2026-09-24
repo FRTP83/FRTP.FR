@@ -7,8 +7,9 @@ import { activities } from "@/lib/data";
 import { SectionHeading } from "@/components/SectionHeading";
 import { StructuredData } from "@/components/StructuredData";
 import { getActivitiesForSite, getProjectsForSite } from "@/lib/server-data";
-import { breadcrumbJsonLd, serviceJsonLd } from "@/lib/structured-data";
+import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/structured-data";
 import { categoryMatchesActivity } from "@/lib/project-categories";
+import { activitySeoContent } from "@/lib/seo-content";
 
 export const revalidate = 60;
 
@@ -54,6 +55,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
   }
 
   const Icon = activity.icon;
+  const seoContent = activitySeoContent[activity.slug];
   const related = projects.filter((project) =>
     project.categories.some((category) => categoryMatchesActivity(category, activity.slug, activity.title))
   );
@@ -67,7 +69,8 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
             { name: "Activités", path: "/activites" },
             { name: activity.title, path: `/activites/${activity.slug}` }
           ]),
-          serviceJsonLd(activity)
+          serviceJsonLd(activity),
+          ...(seoContent ? [faqJsonLd(seoContent.faq)] : [])
         ]}
       />
       <div className="dark-panel px-4 pb-12 pt-12 text-white md:px-6 md:pb-16 md:pt-18">
@@ -86,7 +89,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
               </p>
             </div>
             <h1 className="mt-5 max-w-4xl font-display text-[2.75rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
-              {activity.title}
+              {seoContent?.heading ?? `${activity.title} à Fréjus et dans le Var`}
             </h1>
             <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
               {activity.description}
@@ -109,28 +112,34 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
 
       <div className="px-4 py-10 md:px-6 md:py-16">
         <div className="mx-auto max-w-7xl">
-          <div className="activity-detail-layout">
-            <div className="activity-detail-copy">
-              <SectionHeading eyebrow="Intervention" title="Une intervention cadrée, du repérage à la remise en état." text={activity.interventionExample} />
-              <Link href="/contact" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-frtp-orange px-5 py-4 text-sm font-black text-white transition hover:bg-frtp-orangeDark active:translate-y-px sm:w-auto md:mt-8">
-                Demander un devis <ArrowRight size={18} />
-              </Link>
-            </div>
-
-            <div className="activity-detail-services">
-              <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-blue">Travaux réalisés</p>
-              <div className="mt-6 grid gap-0 sm:grid-cols-2">
-                {activity.services.map((service) => (
-                  <p key={service} className="activity-detail-service">
-                    <CheckCircle2 size={17} />
-                    {service}
+          {seoContent ? (
+            <div className="mb-12 grid gap-8 border-b border-zinc-300 pb-12 md:mb-16 md:grid-cols-[0.9fr_1.1fr] md:pb-16">
+              <div>
+                <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-blue">Sur le terrain</p>
+                <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-zinc-950 md:text-5xl">
+                  {seoContent.heading}
+                </h2>
+                <p className="mt-5 text-base font-medium leading-8 text-zinc-700">{seoContent.introduction}</p>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Link href="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 bg-frtp-orange px-5 py-3 text-sm font-black text-white">
+                    Demander un devis <ArrowRight size={17} />
+                  </Link>
+                  <Link href="/zones-intervention" className="inline-flex min-h-12 items-center gap-2 px-1 font-black text-frtp-blue">
+                    Voir la zone d'intervention <ArrowRight size={17} />
+                  </Link>
+                </div>
+              </div>
+              <div className="grid content-start gap-3 sm:grid-cols-2">
+                {seoContent.useCases.map((item) => (
+                  <p key={item} className="flex min-h-16 items-start gap-3 border border-zinc-300 bg-white p-4 text-sm font-bold leading-6 text-zinc-800">
+                    <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-frtp-orange" />
+                    {item}
                   </p>
                 ))}
               </div>
             </div>
-          </div>
-
-          <div className="mt-12 md:mt-16">
+          ) : null}
+          <div>
             <SectionHeading eyebrow="Chantiers associés" title="Quelques références proches de cette activité." />
             <div className="activity-detail-related-grid mt-8 md:mt-10">
             {related.length ? (
@@ -165,6 +174,35 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
             )}
             </div>
           </div>
+
+          {seoContent ? (
+            <div className="mt-12 grid gap-10 border-t border-zinc-300 pt-12 md:mt-16 md:grid-cols-2 md:pt-16">
+              <section>
+                <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-blue">Déroulement</p>
+                <h2 className="mt-4 font-display text-3xl font-bold text-zinc-950">Un chantier préparé étape par étape</h2>
+                <ol className="mt-7 grid gap-5">
+                  {seoContent.process.map((step, index) => (
+                    <li key={step.title} className="grid grid-cols-[2rem_1fr] gap-3">
+                      <b className="font-display text-xl text-frtp-orange">{String(index + 1).padStart(2, "0")}</b>
+                      <div><h3 className="font-black text-zinc-950">{step.title}</h3><p className="mt-1 text-sm leading-7 text-zinc-600">{step.text}</p></div>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+              <section>
+                <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-blue">Questions fréquentes</p>
+                <h2 className="mt-4 font-display text-3xl font-bold text-zinc-950">Préparer votre demande</h2>
+                <div className="mt-7 grid gap-4">
+                  {seoContent.faq.map((item) => (
+                    <details key={item.question} className="border border-zinc-300 bg-white p-5">
+                      <summary className="cursor-pointer font-black leading-6 text-zinc-950">{item.question}</summary>
+                      <p className="mt-3 text-sm leading-7 text-zinc-600">{item.answer}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>
