@@ -3,6 +3,7 @@ import Image from "next/image";
 import { CheckCircle2, HardHat, MapPinned, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
 import { getStudioSettings } from "@/lib/server-data";
 import { buildPageMetadata } from "@/lib/metadata";
+import { RichText } from "@/components/RichText";
 
 export const revalidate = 60;
 
@@ -24,9 +25,9 @@ export default async function CompanyPage() {
             {studio.companyTitle}
           </h1>
           {studio.companyIntro ? (
-            <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
-              {studio.companyIntro}
-            </p>
+            <div className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
+              <RichText content={studio.companyIntro} className="company-index-intro" />
+            </div>
           ) : null}
         </div>
       </div>

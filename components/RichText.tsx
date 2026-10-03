@@ -7,7 +7,8 @@ type RichTextProps = {
 
 export function RichText({ content, className = "" }: RichTextProps) {
   const blocks = content
-    .split(/\n{2,}/)
+    .replace(/\r\n?/g, "\n")
+    .split(/\n[ \t]*\n(?:[ \t]*\n)*/)
     .map((block) => block.trim())
     .filter(Boolean);
 

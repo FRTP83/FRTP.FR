@@ -2157,6 +2157,16 @@ svg {
   margin: 0;
 }
 
+.company-index-intro.rich-text {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.company-index-intro.rich-text :is(h2, h3, strong) {
+  color: inherit;
+}
+
 .rich-text strong {
   color: #111418;
   font-weight: 800;
