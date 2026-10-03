@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { isLocalPreview } from "@/lib/supabase";
 
 export type ContactMailPayload = {
   name: string;
@@ -27,6 +28,7 @@ export function isMailConfigured() {
 }
 
 export async function sendContactRequestMail(payload: ContactMailPayload) {
+  if (isLocalPreview) return { skipped: true };
   if (isResendConfigured()) {
     return sendWithResend(payload);
   }

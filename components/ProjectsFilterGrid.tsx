@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, MapPin } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { SiteProject } from "@/lib/server-data";
+import { GeographicFilters } from "@/components/GeographicFilters";
 
 type ProjectsFilterGridProps = {
   projects: SiteProject[];
@@ -15,11 +16,11 @@ const ALL_PROJECTS = "__all__";
 
 export function ProjectsFilterGrid({ projects, categoryCounts }: ProjectsFilterGridProps) {
   const [activeCategory, setActiveCategory] = useState(ALL_PROJECTS);
+  const [department, setDepartment] = useState("");
+  const [city, setCity] = useState("");
   const visibleProjects = useMemo(
-    () => activeCategory === ALL_PROJECTS
-      ? projects
-      : projects.filter((project) => project.categories.includes(activeCategory)),
-    [activeCategory, projects]
+    () => projects.filter(project => (activeCategory === ALL_PROJECTS || project.categories.includes(activeCategory)) && (!department || project.departmentCode === department) && (!city || (project.cityCode || project.city) === city)),
+    [activeCategory, projects, department, city]
   );
 
   return (
@@ -46,6 +47,9 @@ export function ProjectsFilterGrid({ projects, categoryCounts }: ProjectsFilterG
         ))}
       </div>
 
+      <GeographicFilters locations={projects} department={department} city={city} onDepartmentChange={value => { setDepartment(value); setCity(""); }} onCityChange={setCity} />
+      <p aria-live="polite" className="mt-4 text-sm text-zinc-600">{visibleProjects.length} chantier{visibleProjects.length > 1 ? "s" : ""}</p>
+      {!visibleProjects.length ? <p className="mt-6 text-zinc-700">Aucun chantier pour ces critères. Essayez une autre commune ou catégorie.</p> : null}
       <div className="projects-index-grid mt-8 md:mt-12">
         {visibleProjects.map((project) => (
           <Link key={project.slug} href={`/realisations/${project.slug}`} className="projects-index-card group">
@@ -62,7 +66,7 @@ export function ProjectsFilterGrid({ projects, categoryCounts }: ProjectsFilterG
             </span>
             <span className="projects-index-content">
               <span className="projects-index-meta">
-                <span><MapPin size={14} />{project.city}</span>
+                <span><MapPin size={14} />{project.city}{project.departmentName ? `, ${project.departmentName} (${project.departmentCode})` : ""}</span>
               </span>
               <span className="projects-index-title">{project.title}</span>
               <span className="projects-index-text">{project.short}</span>

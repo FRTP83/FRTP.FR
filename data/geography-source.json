@@ -1,0 +1,6 @@
+{
+  "source": "https://geo.api.gouv.fr/decoupage-administratif",
+  "retrievedAt": "2026-10-02T09:57:34.619Z",
+  "departments": 101,
+  "communes": 34969
+}

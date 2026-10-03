@@ -6,24 +6,9 @@ export type ActivitySeoContent = {
   faq: Array<{ question: string; answer: string }>;
 };
 
-const commonProcess = [
-  {
-    title: "Visite et repérage",
-    text: "FRTP étudie les accès, les niveaux, les réseaux existants et les contraintes propres au terrain."
-  },
-  {
-    title: "Préparation de l'intervention",
-    text: "Les moyens, les terrassements et l'évacuation éventuelle des matériaux sont organisés selon le chantier."
-  },
-  {
-    title: "Exécution et contrôle",
-    text: "Les travaux sont réalisés par étapes, avec contrôle des niveaux et remise en état de la zone d'intervention."
-  }
-];
-
 export const activitySeoContent: Record<string, ActivitySeoContent> = {
   terrassement: {
-    heading: "Entreprise de terrassement à Fréjus",
+    heading: "Travaux de terrassement dans le Var et les Alpes-Maritimes",
     introduction:
       "FRTP réalise les travaux de terrassement nécessaires à la préparation d'un terrain, d'un accès ou d'une plateforme dans le Var et les Alpes-Maritimes. Chaque intervention est étudiée selon la nature du sol, les niveaux à atteindre, les accès disponibles et les réseaux présents.",
     useCases: [
@@ -34,7 +19,20 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
       "Évacuation de terres et déblais selon les besoins du chantier",
       "Remodelage et remise en forme des abords"
     ],
-    process: commonProcess,
+    process: [
+    {
+        "title": "Définir les niveaux et les volumes",
+        "text": "Les plans, les dimensions de la zone et les accès permettent de préciser le décaissement, les fouilles et les déblais à évacuer."
+    },
+    {
+        "title": "Préparer les fouilles et le support",
+        "text": "Les terrassements sont adaptés à l’ouvrage prévu : tranchée de réseau, fondation de soutènement, plateforme ou structure de voirie."
+    },
+    {
+        "title": "Régler le terrain pour la suite des travaux",
+        "text": "Le fond de forme et les niveaux doivent permettre la pose des réseaux ou la réalisation du revêtement prévu au chantier."
+    }
+],
     faq: [
       {
         question: "Dans quelles communes FRTP réalise-t-elle des terrassements ?",
@@ -54,7 +52,7 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
     ]
   },
   vrd: {
-    heading: "Travaux VRD à Fréjus et dans le Var",
+    heading: "Travaux VRD dans le Var et les Alpes-Maritimes",
     introduction:
       "FRTP prend en charge des travaux de voirie et réseaux divers pour préparer, raccorder et aménager des terrains, résidences et sites professionnels dans le Var et les Alpes-Maritimes : tranchées techniques, fourreaux, regards, raccordements et reprises de voirie.",
     useCases: [
@@ -65,7 +63,20 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
       "Création ou réfection d'accès et de cheminements",
       "Remise en état des surfaces après intervention"
     ],
-    process: commonProcess,
+    process: [
+    {
+        "title": "Coordonner les réseaux et les accès",
+        "text": "Nous définissons le tracé des réseaux, leurs niveaux et les accès prévus."
+    },
+    {
+        "title": "Poser les ouvrages enterrés",
+        "text": "Nous ouvrons les tranchées et posons les canalisations, les fourreaux et les regards avant de réaliser la voirie."
+    },
+    {
+        "title": "Réaliser les surfaces de circulation",
+        "text": "Nous préparons les fonds de forme, posons les bordures et réalisons les revêtements des accès et des cheminements."
+    }
+],
     faq: [
       {
         question: "Que comprennent les travaux VRD ?",
@@ -96,7 +107,20 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
       "Drainage de terrain et des abords",
       "Mise en conformité d'installations existantes"
     ],
-    process: commonProcess,
+    process: [
+    {
+        "title": "Identifier le cheminement des eaux",
+        "text": "L’état du réseau, les points de collecte et les niveaux de raccordement déterminent les canalisations et les ouvrages nécessaires."
+    },
+    {
+        "title": "Créer les points de collecte",
+        "text": "Nous posons les regards et les caniveaux, puis raccordons les ouvrages au réseau d’évacuation."
+    },
+    {
+        "title": "Reprendre les surfaces autour du réseau",
+        "text": "Après la pose des canalisations et le remblaiement des tranchées, nous reprenons les enrobés et le marquage au sol."
+    }
+],
     faq: [
       { question: "Quels travaux d'assainissement réalise FRTP ?", answer: "FRTP intervient sur les réseaux d'eaux usées et d'eaux pluviales, les raccordements, le drainage, les regards et la reprise de canalisations selon les besoins du chantier." },
       { question: "FRTP peut-elle reprendre un réseau existant ?", answer: "Oui. Une visite permet d'identifier le réseau, les niveaux, les accès et la nature de la reprise à prévoir avant l'établissement du devis." },
@@ -115,7 +139,20 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
       "Réglage des pentes et évacuation des eaux",
       "Enrobés et finitions selon le chantier"
     ],
-    process: commonProcess,
+    process: [
+    {
+        "title": "Examiner la structure et les usages",
+        "text": "Le revêtement existant, la circulation et l’écoulement des eaux permettent de définir les zones à reprendre et les niveaux de la nouvelle voirie."
+    },
+    {
+        "title": "Reconstituer le support",
+        "text": "Nous déposons le revêtement à reprendre, puis préparons et compactons la structure de voirie."
+    },
+    {
+        "title": "Poser le revêtement et le marquage",
+        "text": "Nous posons le revêtement prévu et réalisons le marquage des zones de stationnement et de circulation."
+    }
+],
     faq: [
       { question: "FRTP réalise-t-elle les chemins d'accès ?", answer: "Oui. Le chantier peut aller du terrassement et du fond de forme jusqu'aux bordures et à la finition prévue au devis." },
       { question: "Pouvez-vous créer un parking ?", answer: "Oui, pour les particuliers, les copropriétés et les professionnels, avec une attention portée aux niveaux, aux circulations et à l'évacuation des eaux pluviales." },
@@ -134,7 +171,20 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
       "Recherche et protection de réseaux existants",
       "Remblaiement et réfection après intervention"
     ],
-    process: commonProcess,
+    process: [
+    {
+        "title": "Définir les réseaux à installer",
+        "text": "Nous identifions les réseaux à poser ou à reprendre : eau potable, eaux usées et pluviales, télécom et électricité."
+    },
+    {
+        "title": "Préparer les tranchées et poser les ouvrages",
+        "text": "Nous réalisons les tranchées, posons les canalisations ou les fourreaux et installons les regards et chambres de tirage."
+    },
+    {
+        "title": "Refermer et reprendre les abords",
+        "text": "Une fois les réseaux posés, nous remblayons les tranchées et reprenons les surfaces concernées : voirie, accès ou cheminements."
+    }
+],
     faq: [
       { question: "Quelle différence entre réseaux secs et réseaux humides ?", answer: "Les réseaux secs concernent notamment l'électricité et les télécommunications. Les réseaux humides transportent l'eau potable, les eaux usées ou les eaux pluviales." },
       { question: "FRTP réalise-t-elle les tranchées pour les raccordements ?", answer: "Oui. FRTP réalise les terrassements, tranchées, poses de fourreaux ou canalisations, puis le remblaiement et la remise en état prévus au chantier." },
@@ -153,7 +203,20 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
       "Préparation des supports extérieurs",
       "Remise en état après travaux"
     ],
-    process: commonProcess,
+    process: [
+    {
+        "title": "Prendre en compte le dénivelé et les usages",
+        "text": "Les abords d’une villa et la limite d’une résidence ne posent pas les mêmes contraintes : cheminement, accès, maintien des terres ou clôture."
+    },
+    {
+        "title": "Construire les ouvrages adaptés au terrain",
+        "text": "Nous réalisons les terrassements, les fondations et les ouvrages de soutènement prévus pour reprendre les différences de niveau du terrain."
+    },
+    {
+        "title": "Terminer les cheminements et les abords",
+        "text": "Nous préparons les supports et posons les revêtements des cours, des cheminements et des abords."
+    }
+],
     faq: [
       { question: "Quels aménagements extérieurs réalise FRTP ?", answer: "FRTP intervient sur la préparation de cours, cheminements, accès, abords de bâtiments et terrains avant les finitions prévues au projet." },
       { question: "Pouvez-vous reprendre les niveaux autour d'une maison ?", answer: "Oui. La reprise des niveaux, le décaissement et la préparation du support peuvent être étudiés après analyse des pentes, des accès et de l'écoulement des eaux." },
@@ -172,7 +235,20 @@ export const activitySeoContent: Record<string, ActivitySeoContent> = {
       "Tri et évacuation des matériaux selon le chantier",
       "Remise en sécurité et préparation du support"
     ],
-    process: commonProcess,
+    process: [
+    {
+        "title": "Délimiter les ouvrages à déposer",
+        "text": "Nous définissons les parties à retirer, les ouvrages à conserver et les protections nécessaires."
+    },
+    {
+        "title": "Déposer et préparer la zone",
+        "text": "Nous déposons les ouvrages concernés et évacuons les matériaux avant de préparer le support."
+    },
+    {
+        "title": "Reconstruire le support et la surface",
+        "text": "Le support est repris pour accueillir les nouveaux réseaux, ouvrages ou revêtements prévus."
+    }
+],
     faq: [
       { question: "FRTP réalise-t-elle des démolitions complètes ?", answer: "FRTP étudie principalement les démolitions ciblées, déposes, curages et reprises nécessaires à la préparation ou à la sécurisation d'un chantier." },
       { question: "L'évacuation des matériaux est-elle comprise ?", answer: "Elle peut être intégrée au devis selon la nature et le volume des matériaux, les possibilités de tri et les conditions d'accès au chantier." },

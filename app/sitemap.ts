@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { getActivitiesForSite, getNewsForSite, getProjectsForSite } from "@/lib/server-data";
+import { serviceAreas } from "@/lib/service-areas";
 
 export const revalidate = 3600;
 
@@ -17,7 +18,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/activites",
     "/realisations",
     "/avant-apres",
-    "/zones-intervention",
     "/actualites",
     "/contact",
     "/mentions-legales",
@@ -30,6 +30,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const activityRoutes = activities.map((activity) => ({
     url: `${SITE_URL}/activites/${activity.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.6
+  }));
+
+  const areaRoutes = serviceAreas.map(area => ({
+    url: `${SITE_URL}/zones-intervention/${area.slug}`,
     changeFrequency: "monthly" as const,
     priority: 0.6
   }));
@@ -47,5 +53,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5
   }));
 
-  return [...staticRoutes, ...activityRoutes, ...projectRoutes, ...newsRoutes];
+  return [...staticRoutes, ...areaRoutes, ...activityRoutes, ...projectRoutes, ...newsRoutes];
 }

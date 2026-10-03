@@ -12,11 +12,16 @@ import {
 export const navItems = [
   { label: "Accueil", href: "/" },
   { label: "Entreprise", href: "/entreprise" },
-  { label: "Activités", href: "/activites" },
+  { label: "Prestations", href: "/activites" },
   { label: "Réalisations", href: "/realisations" },
   { label: "Avant / Après", href: "/avant-apres" },
   { label: "Actualités", href: "/actualites" },
   { label: "Contact", href: "/contact" }
+];
+
+export const prestationsNavItems = [
+  { label: "Nos prestations", href: "/activites#prestations" },
+  { label: "Zones d’intervention", href: "/activites#zones-intervention" }
 ];
 
 export const activities = [
@@ -82,6 +87,9 @@ export type Project = {
   title: string;
   slug: string;
   city: string;
+  cityCode?: string;
+  departmentCode?: string;
+  departmentName?: string;
   category: string;
   categories: string[];
   date: string;
@@ -101,20 +109,15 @@ export const stats = [
   { value: "2026", label: "Chantiers documentés" }
 ];
 
-export const news = [
-  {
-    title: "Les chantiers récents de FRTP",
-    slug: "chantiers-recents",
-    excerpt:
-      "Suivez les dernières interventions de terrassement, VRD et aménagement extérieur réalisées par FRTP."
-  },
-  {
-    title: "L'évolution des travaux en images",
-    slug: "photos-chantier",
-    excerpt:
-      "Les photos avant, pendant et après permettent de suivre clairement l'évolution de chaque chantier."
-  }
-];
+export type News = {
+  title: string;
+  slug: string;
+  excerpt: string;
+  is_archived?: boolean;
+};
+
+// Seuls les articles réellement publiés dans l'administration sont affichés.
+export const news: News[] = [];
 
 export const serviceArea = [
   "Fréjus",

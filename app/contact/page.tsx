@@ -9,7 +9,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Contact",
+  title: "Devis travaux publics dans le Var et les Alpes-Maritimes",
   description: "Demandez un devis à FRTP pour vos travaux de terrassement, VRD, assainissement ou aménagements extérieurs dans le Var et les Alpes-Maritimes. Tél. 06 58 01 72 71.",
   path: "/contact"
 });

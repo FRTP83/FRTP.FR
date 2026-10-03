@@ -13,6 +13,8 @@ create table if not exists public.projects (
   title text not null,
   slug text not null unique,
   city text,
+  city_code text,
+  department_code text,
   category_id uuid references public.project_categories(id) on delete set null,
   short_description text,
   description text,
@@ -24,7 +26,11 @@ create table if not exists public.projects (
   is_featured boolean not null default false,
   is_published boolean not null default false,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint projects_location_pair check (
+    (city_code is null and department_code is null) or
+    (city_code is not null and department_code is not null and city_code ~ '^[0-9A-Z]{5}$' and department_code ~ '^([0-9]{2,3}|2A|2B)$')
+  )
 );
 
 create table if not exists public.project_images (
@@ -56,6 +62,7 @@ create table if not exists public.news (
   content text,
   cover_image_url text,
   is_published boolean not null default false,
+  is_archived boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

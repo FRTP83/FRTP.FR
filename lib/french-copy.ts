@@ -1,5 +1,5 @@
 const replacements: Array<[RegExp, string]> = [
-  [/\u2014/g, "-"],
+  [/[\u2013\u2014]/g, "-"],
   [/\bAmenagements exterieurs\b/gi, "Aménagements extérieurs"],
   [/\bAmenagement extérieur\b/gi, "Aménagement extérieur"],
   [/\bAmenagement\b/gi, "Aménagement"],

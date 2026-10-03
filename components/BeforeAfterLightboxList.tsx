@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import type { BeforeAfterItem } from "@/lib/before-after";
+import { GeographicFilters } from "@/components/GeographicFilters";
 
 type BeforeAfterLightboxListProps = {
   pairs: BeforeAfterItem[];
@@ -20,6 +21,8 @@ type LightboxPhoto = {
 
 export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps) {
   const [activeCategory, setActiveCategory] = useState("__all__");
+  const [department, setDepartment] = useState("");
+  const [city, setCity] = useState("");
   const photos = useMemo<LightboxPhoto[]>(
     () => pairs.flatMap((pair) => [
       {
@@ -51,8 +54,8 @@ export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps)
     [pairs]
   );
   const visiblePairs = useMemo(
-    () => activeCategory === "__all__" ? pairs : pairs.filter((pair) => pair.category === activeCategory),
-    [activeCategory, pairs]
+    () => pairs.filter(pair => (activeCategory === "__all__" || pair.category === activeCategory) && (!department || pair.departmentCode === department) && (!city || (pair.cityCode || pair.city) === city)),
+    [activeCategory, pairs, department, city]
   );
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const activePhoto = activeIndex === null ? null : photos[activeIndex];
@@ -120,6 +123,9 @@ export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps)
         ))}
       </div>
 
+      <GeographicFilters locations={pairs} department={department} city={city} onDepartmentChange={value => { setDepartment(value); setCity(""); }} onCityChange={setCity} />
+      <p aria-live="polite" className="mt-4 text-sm text-zinc-600">{visiblePairs.length} comparaison{visiblePairs.length > 1 ? "s" : ""}</p>
+      {!visiblePairs.length ? <p className="mt-6 text-zinc-700">Aucune comparaison pour ces critères.</p> : null}
       <div className="before-after-index-grid mt-8 md:mt-12">
         {visiblePairs.map((pair) => {
           const beforeIndex = photos.findIndex((photo) => photo.id === `${pair.id}-before`);
@@ -133,7 +139,7 @@ export function BeforeAfterLightboxList({ pairs }: BeforeAfterLightboxListProps)
               </div>
               <div className="before-after-index-caption">
                 <p>{pair.title}</p>
-                <span>{pair.city} - {pair.category}</span>
+                <span>{pair.city}{pair.departmentName ? `, ${pair.departmentName} (${pair.departmentCode})` : ""} · {pair.category}</span>
               </div>
             </article>
           );

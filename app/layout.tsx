@@ -22,7 +22,7 @@ const body = Manrope({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "FRTP - Terrassement, VRD et travaux publics à Fréjus",
+    default: "FRTP - Terrassement, VRD et travaux publics dans le Var et les Alpes-Maritimes",
     template: "%s | FRTP"
   },
   description: SITE_DESCRIPTION,
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "FRTP - Terrassement, VRD et travaux publics à Fréjus",
+    title: "FRTP - Terrassement, VRD et travaux publics dans le Var et les Alpes-Maritimes",
     description: SITE_DESCRIPTION,
     images: [
       {
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "FRTP - Terrassement, VRD et travaux publics à Fréjus",
+    title: "FRTP - Terrassement, VRD et travaux publics dans le Var et les Alpes-Maritimes",
     description: SITE_DESCRIPTION,
     images: ["/chantier/horizon-hero.jpeg"]
   },

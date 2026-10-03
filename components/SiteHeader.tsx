@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { navItems } from "@/lib/data";
 import { Logo } from "@/components/Logo";
+import { PrestationsNavigation } from "@/components/PrestationsNavigation";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,6 +63,9 @@ export function SiteHeader() {
 
         <nav aria-label="Navigation principale" className="hidden items-center gap-8 text-[15px] font-extrabold text-zinc-200 lg:flex">
           {desktopNavItems.map((item) => (
+            item.href === "/activites" ? (
+              <PrestationsNavigation key={item.href} active={isActivePath(pathname, item.href)} onNavigate={closeMenu} />
+            ) : (
             <Link
               key={item.href}
               href={item.href}
@@ -72,6 +76,7 @@ export function SiteHeader() {
             >
               {item.label}
             </Link>
+            )
           ))}
         </nav>
 
@@ -98,9 +103,12 @@ export function SiteHeader() {
       </div>
 
       {isOpen ? (
-        <div id="site-mobile-menu" className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-white/10 bg-frtp-black/92 backdrop-blur-xl lg:hidden">
+        <div id="site-mobile-menu" className="max-h-[calc(100dvh-6rem)] overflow-y-auto border-t border-white/10 bg-frtp-black/92 backdrop-blur-xl lg:hidden">
           <nav aria-label="Navigation mobile" className="mx-auto grid max-w-7xl gap-1 px-4 py-4">
             {navItems.map((item) => (
+              item.href === "/activites" ? (
+                <PrestationsNavigation key={item.href} mobile active={isActivePath(pathname, item.href)} onNavigate={closeMenu} />
+              ) : (
               <Link
                 key={item.href}
                 href={item.href}
@@ -112,6 +120,7 @@ export function SiteHeader() {
               >
                 {item.label}
               </Link>
+              )
             ))}
             <Link
               href="/contact"
@@ -132,6 +141,8 @@ function isActivePath(pathname: string, href: string) {
   if (href === "/") {
     return pathname === "/";
   }
+
+  if (href === "/activites" && pathname.startsWith("/zones-intervention/")) return true;
 
   return pathname === href || pathname.startsWith(`${href}/`);
 }

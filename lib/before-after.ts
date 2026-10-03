@@ -2,6 +2,9 @@ export type BeforeAfterItem = {
   id: string;
   title: string;
   city: string;
+  cityCode?: string;
+  departmentCode?: string;
+  departmentName?: string;
   category: string;
   before: string;
   after: string;

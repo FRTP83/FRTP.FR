@@ -17,7 +17,8 @@ import {
   Trash2,
   Upload
 } from "lucide-react";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured, isLocalPreview } from "@/lib/supabase";
+import { LocationFields } from "@/components/LocationFields";
 import { slugify } from "@/lib/utils";
 import { defaultBeforeAfterItems, type BeforeAfterItem } from "@/lib/before-after";
 import { defaultProjectHeroSettings, normalizeProjectHeroSettings, type ProjectHeroSettings, type ProjectHeroSettingsMap } from "@/lib/project-hero";
@@ -42,6 +43,8 @@ type ProjectRow = {
   title: string;
   slug: string;
   city: string | null;
+  city_code?: string | null;
+  department_code?: string | null;
   category_id: string | null;
   project_category_links?: Array<{ category_id: string }>;
   short_description: string | null;
@@ -64,6 +67,7 @@ type NewsRow = {
   content: string | null;
   cover_image_url: string | null;
   is_published: boolean;
+  is_archived?: boolean;
   created_at: string;
 };
 type RequestRow = {
@@ -116,6 +120,11 @@ export function AdminConsole() {
   );
 
   useEffect(() => {
+    if (isLocalPreview) {
+      setStatus("signed-in");
+      refreshAdminData();
+      return;
+    }
     if (!supabase) {
       setStatus("signed-out");
       return;
@@ -148,15 +157,15 @@ export function AdminConsole() {
     setLoading(true);
 
     const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
 
     const [categoryResult, projectResult, newsResult, requestResult, studioResult, beforeAfterResult, projectHeroResult] = await Promise.all([
       supabase.from("project_categories").select("id,name,slug").order("name"),
       supabase
         .from("projects")
-        .select("id,title,slug,city,category_id,short_description,description,initial_problem,works_done,client_type,work_date,duration,is_published,is_featured,created_at,project_category_links(category_id),project_images(id,project_id,image_url,image_type,caption,sort_order)")
+        .select("id,title,slug,city,city_code,department_code,category_id,short_description,description,initial_problem,works_done,client_type,work_date,duration,is_published,is_featured,created_at,project_category_links(category_id),project_images(id,project_id,image_url,image_type,caption,sort_order)")
         .order("created_at", { ascending: false }),
-      supabase.from("news").select("id,title,slug,excerpt,content,cover_image_url,is_published,created_at").order("created_at", { ascending: false }),
+      supabase.from("news").select("id,title,slug,excerpt,content,cover_image_url,is_published,is_archived,created_at").order("created_at", { ascending: false }),
       supabase.from("contact_requests").select("id,name,company,email,phone,city,work_type,message,status,created_at").order("created_at", { ascending: false }),
       token
         ? fetch("/api/admin/studio", { headers: { Authorization: `Bearer ${token}` } }).then(async (response) => ({
@@ -231,7 +240,7 @@ export function AdminConsole() {
     if (!supabase) return false;
 
     const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
 
     if (!token) return false;
 
@@ -267,6 +276,8 @@ export function AdminConsole() {
       title,
       slug: String(formData.get("slug") || slugify(title)),
       city: nullable(formData.get("city")),
+      city_code: nullable(formData.get("city_code")),
+      department_code: nullable(formData.get("department_code")),
       category_id: categoryIds[0] ?? null,
       short_description: nullable(formData.get("short_description")),
       description: nullable(formData.get("description")),
@@ -280,42 +291,27 @@ export function AdminConsole() {
       updated_at: new Date().toISOString()
     };
 
-    const normalizedPayload = normalizeCopyObject(payload);
-    const result = selectedProject
-      ? await supabase.from("projects").update(normalizedPayload).eq("id", selectedProject.id).select("id").single()
-      : await supabase.from("projects").insert(normalizedPayload).select("id").single();
-
-    if (result.error || !result.data) {
-      setNotice(result.error?.message ?? "Chantier non enregistré.");
-      setLoading(false);
-      return;
-    }
-
-    const projectId = result.data.id;
-    const { error: deleteCategoryError } = await supabase
-      .from("project_category_links")
-      .delete()
-      .eq("project_id", projectId);
-    const categoryLinkResult = categoryIds.length
-      ? await supabase.from("project_category_links").insert(
-          categoryIds.map((categoryId) => ({ project_id: projectId, category_id: categoryId }))
-        )
-      : { error: null };
-
-    if (deleteCategoryError || categoryLinkResult.error) {
-      setNotice(deleteCategoryError?.message ?? categoryLinkResult.error?.message ?? "Catégories non enregistrées.");
+    const session = await supabase.auth.getSession();
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
+    const response = await fetch("/api/admin/projects", {
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+      body: JSON.stringify({ id: selectedProject?.id, project: payload, categoryIds })
+    }).catch(() => null);
+    const result = await response?.json().catch(() => null);
+    if (!response?.ok || !result?.id) {
+      setNotice(result?.error ?? "Chantier non enregistré. Vérifiez la connexion puis réessayez.");
       setLoading(false);
       return;
     }
 
     const image = formData.get("image") as File | null;
     if (image && image.size > 0) {
-      await uploadProjectImage(result.data.id, image, "gallery", title, 0);
+      await uploadProjectImage(result.id, image, "gallery", title, 0);
     }
 
-    await saveProjectHeroSettings(result.data.id, heroSettingsFromForm(formData));
+    await saveProjectHeroSettings(result.id, heroSettingsFromForm(formData));
 
-    setSelectedProjectId(result.data.id);
+    setSelectedProjectId(result.id);
     setNotice(selectedProject ? "Chantier modifié." : "Chantier ajouté.");
     await refreshAdminData();
   }
@@ -345,7 +341,7 @@ export function AdminConsole() {
     if (!supabase) return;
 
     const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
 
     if (!token) {
       setNotice("Session admin expiree. Reconnectez-vous.");
@@ -440,8 +436,20 @@ export function AdminConsole() {
   async function deleteProject(projectId: string) {
     if (!supabase) return;
     setLoading(true);
-    const { error } = await supabase.from("projects").delete().eq("id", projectId);
-    setNotice(error ? error.message : "Chantier supprimé.");
+    const session = await supabase.auth.getSession();
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
+    const response = await fetch("/api/admin/projects", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+      body: JSON.stringify({ id: projectId })
+    }).catch(() => null);
+    const result = await response?.json().catch(() => null);
+    if (!response?.ok) {
+      setNotice(result?.error ?? "Chantier non supprimé. Vérifiez la connexion puis réessayez.");
+      setLoading(false);
+      return;
+    }
+    setNotice("Chantier supprimé.");
     setSelectedProjectId("new");
     await refreshAdminData();
   }
@@ -476,6 +484,7 @@ export function AdminConsole() {
       content: nullable(formData.get("content")),
       cover_image_url: coverImageUrl,
       is_published: formData.get("is_published") === "on",
+      is_archived: formData.get("is_archived") === "on",
       created_at: publicationDate ? new Date(`${publicationDate}T12:00:00`).toISOString() : new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -521,7 +530,7 @@ export function AdminConsole() {
     formData.append("current", JSON.stringify(studioSettings));
 
     const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
 
     if (!token) {
       setNotice("Session admin expiree. Reconnectez-vous.");
@@ -557,7 +566,7 @@ export function AdminConsole() {
     const form = event.currentTarget;
     setLoading(true);
     const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
 
     if (!token) {
       setNotice("Session admin expiree. Reconnectez-vous.");
@@ -614,6 +623,7 @@ export function AdminConsole() {
 
   return (
     <div className="grid gap-6">
+      {isLocalPreview ? <p className="border-l-4 border-frtp-orange bg-amber-50 p-4 text-sm font-semibold text-zinc-800">Prévisualisation locale. Les enregistrements restent sur cet ordinateur. Le site publié n’est pas modifié.</p> : null}
       <div className="flex flex-col justify-between gap-4 border border-zinc-200 bg-white p-4 md:flex-row md:items-center">
         <div className="flex flex-wrap gap-2">
           {tabs.map((tab) => {
@@ -720,7 +730,7 @@ export function AdminConsole() {
             rows={news.map((item) => ({
               id: item.id,
               title: item.title,
-              meta: item.is_published ? "publiée" : "brouillon"
+              meta: item.is_published ? (item.is_archived ? "archive publiée" : "publiée") : "brouillon"
             }))}
             onSelect={setSelectedNewsId}
           />
@@ -879,10 +889,7 @@ function BeforeAfterForm({
                 Titre
                 <input name={`itemTitle${index}`} value={item.title} onChange={(event) => updateItem(index, "title", event.target.value)} className="h-12 border border-zinc-300 px-3 font-normal outline-none focus:border-frtp-blue" />
               </label>
-              <label className="grid gap-2 text-sm font-bold">
-                Commune
-                <input name={`itemCity${index}`} value={item.city} onChange={(event) => updateItem(index, "city", event.target.value)} className="h-12 border border-zinc-300 px-3 font-normal outline-none focus:border-frtp-blue" />
-              </label>
+              <LocationFields city={item.city} cityCode={item.cityCode} departmentCode={item.departmentCode} names={{ city: `itemCity${index}`, cityCode: `itemCityCode${index}`, departmentCode: `itemDepartmentCode${index}` }} />
               <label className="grid gap-2 text-sm font-bold">
                 Categorie
                 <input name={`itemCategory${index}`} value={item.category} onChange={(event) => updateItem(index, "category", event.target.value)} className="h-12 border border-zinc-300 px-3 font-normal outline-none focus:border-frtp-blue" />
@@ -1299,7 +1306,7 @@ function ProjectForm({
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Titre" name="title" defaultValue={project?.title} required />
         <Field label="Slug" name="slug" defaultValue={project?.slug} />
-        <Field label="Commune" name="city" defaultValue={project?.city} required />
+        <LocationFields city={project?.city} cityCode={project?.city_code} departmentCode={project?.department_code} />
         <label className="grid gap-2 text-sm font-bold">
           Catégories
           <span className="grid gap-2 border border-zinc-300 bg-white p-3 font-normal">
@@ -1658,6 +1665,13 @@ function NewsForm({
       <TextArea label="Extrait" name="excerpt" defaultValue={news?.excerpt} />
       <TextArea label="Contenu" name="content" defaultValue={news?.content} />
       <PublishControls published={news?.is_published} />
+      <label className="flex items-start gap-3 text-sm font-bold">
+        <input name="is_archived" type="checkbox" defaultChecked={news?.is_archived} className="mt-1 h-4 w-4" />
+        <span>
+          Classer dans les archives
+          <span className="mt-1 block font-normal text-zinc-600">L’article reste accessible à son adresse et apparaît dans les archives des actualités.</span>
+        </span>
+      </label>
       <div className="flex flex-wrap gap-3">
         <SubmitButton loading={loading} label={news ? "Enregistrer les modifications" : "Créer l'actualité"} />
         {news ? <DangerButton label="Supprimer l'actualité" onClick={() => onDelete(news.id)} /> : null}

@@ -22,7 +22,7 @@ export function serviceJsonLd(activity: {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: `${activity.title} à Fréjus et dans le Var`,
+    name: `${activity.title} dans le Var et les Alpes-Maritimes`,
     serviceType: activity.title,
     description: activity.description,
     url: `${SITE_URL}/activites/${activity.slug}`,
@@ -60,6 +60,7 @@ export function projectJsonLd(project: {
   short: string;
   image: string;
   city: string;
+  departmentName?: string;
   category: string;
   categories?: string[];
   date: string;
@@ -76,7 +77,7 @@ export function projectJsonLd(project: {
     creator: { "@id": `${SITE_URL}/#business`, name: SITE_NAME },
     contentLocation: {
       "@type": "Place",
-      address: { "@type": "PostalAddress", addressLocality: project.city, addressCountry: "FR" }
+      address: { "@type": "PostalAddress", addressLocality: project.city, ...(project.departmentName ? { addressRegion: project.departmentName } : {}), addressCountry: "FR" }
     }
   };
 }

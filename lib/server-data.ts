@@ -4,6 +4,7 @@ import { activities as fallbackActivities, news as fallbackNews, projects as fal
 import { defaultProjectHeroSettings, normalizeProjectHeroSettingsMap, type ProjectHeroSettings } from "@/lib/project-hero";
 import { defaultStudioSettings, type StudioSettings } from "@/lib/studio";
 import { normalizeCopyObject, normalizeFrenchCopy } from "@/lib/french-copy";
+import { resolveLegacyLocation, validateLocation } from "@/lib/geography-server";
 
 export type SiteProject = (typeof fallbackProjects)[number] & {
   categories: string[];
@@ -12,6 +13,7 @@ export type SiteProject = (typeof fallbackProjects)[number] & {
     type: string;
   }>;
   heroSettings?: ProjectHeroSettings;
+  description?: string;
 };
 export type SiteNews = (typeof fallbackNews)[number] & {
   content?: string | null;
@@ -34,6 +36,8 @@ type ProjectRow = {
   title: string;
   slug: string;
   city: string | null;
+  city_code?: string | null;
+  department_code?: string | null;
   short_description: string | null;
   description: string | null;
   initial_problem: string | null;
@@ -57,7 +61,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id, title, slug, city, short_description, description, initial_problem, works_done, work_date, category_id"
+      "id, title, slug, city, city_code, department_code, short_description, description, initial_problem, works_done, work_date, category_id"
     )
     .eq("is_published", true)
     .order("created_at", { ascending: false });
@@ -114,10 +118,16 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
         ?.image_url ?? "/chantier/horizon-hero.jpeg";
     const image = projectHeroSettings.imageUrl || fallbackImage;
 
+    const location = project.city_code && project.department_code
+      ? validateLocation(project.department_code, project.city_code)
+      : resolveLegacyLocation(project.city ?? "");
     return {
       title: normalizeFrenchCopy(project.title),
       slug: project.slug,
-      city: normalizeFrenchCopy(project.city ?? "Fréjus"),
+      city: location?.city ?? normalizeFrenchCopy(project.city ?? "Commune à préciser"),
+      cityCode: location?.cityCode,
+      departmentCode: location?.departmentCode,
+      departmentName: location?.departmentName,
       category: normalizeFrenchCopy(primaryCategory ?? categories[0] ?? "Travaux publics"),
       categories: categories.length ? categories : ["Travaux publics"],
       date: project.work_date ? new Date(project.work_date).getFullYear().toString() : "À venir",
@@ -127,6 +137,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
         imageUrl: image
       },
       short: normalizeFrenchCopy(project.short_description ?? "Chantier FRTP publié depuis l'administration."),
+      description: normalizeFrenchCopy(project.description ?? ""),
       problem: normalizeFrenchCopy(project.initial_problem ?? "Contrainte terrain analysée avant intervention."),
       works: project.works_done
         ? project.works_done.split(/\n|,/).map((item) => normalizeFrenchCopy(item.trim())).filter(Boolean)
@@ -155,7 +166,7 @@ export async function getNewsForSite(): Promise<SiteNews[]> {
 
   const { data, error } = await supabase
     .from("news")
-    .select("title, slug, excerpt, content, cover_image_url, created_at")
+    .select("title, slug, excerpt, content, cover_image_url, is_archived, created_at")
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
@@ -169,6 +180,7 @@ export async function getNewsForSite(): Promise<SiteNews[]> {
     excerpt: normalizeFrenchCopy(item.excerpt ?? ""),
     content: item.content ? normalizeFrenchCopy(item.content) : item.content,
     cover_image_url: item.cover_image_url,
+    is_archived: item.is_archived === true,
     created_at: item.created_at
   }));
 }
@@ -209,6 +221,7 @@ export async function getBeforeAfterItemsForSite(): Promise<BeforeAfterItem[]> {
   }
 
   return normalizeCopyObject(data.value as BeforeAfterItem[])
+    .map(item => ({ ...item, ...(item.cityCode && item.departmentCode ? validateLocation(item.departmentCode, item.cityCode) : resolveLegacyLocation(item.city) ?? {}) }))
     .filter((item) => item.isPublished)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 }

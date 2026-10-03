@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: item.title,
+    title: item.is_archived ? `Archive : ${item.title}` : item.title,
     description: item.excerpt,
     alternates: { canonical: `/actualites/${item.slug}` },
     openGraph: {
@@ -92,6 +92,11 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
           </aside>
 
           <div>
+            {item.is_archived ? (
+              <p className="mb-6 border-l-4 border-frtp-orange bg-white p-5 font-semibold leading-7 text-zinc-700">
+                Cet article est une archive. Les dates et informations qu’il contient concernent la période indiquée lors de sa publication.
+              </p>
+            ) : null}
             {item.cover_image_url ? (
               <div className="relative aspect-[16/9] overflow-hidden bg-zinc-200 shadow-technical">
                 <Image src={item.cover_image_url} alt={item.title} fill sizes="(min-width: 1024px) 680px, 100vw" className="object-cover" priority />

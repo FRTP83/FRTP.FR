@@ -80,44 +80,44 @@ export const defaultStudioSettings: StudioSettings = {
     "Entreprise spécialisée en terrassement, voirie, réseaux divers, assainissement et aménagements extérieurs dans le Var et les Alpes-Maritimes.",
   heroImage: "/chantier/horizon-hero.jpeg",
   heroEyebrow: "Fréjus - Var - Alpes-Maritimes",
-  heroPanelEyebrow: "Identité FRTP",
-  heroPanelTitle: "Sobre, technique, solide. Une présence terrain avant tout.",
-  heroPanelItems: ["Travaux publics", "VRD", "Terrassement", "Assainissement"],
-  homeActivitiesTitle: "Des prestations lisibles, du premier coup de pelle à la remise en état.",
+  heroPanelEyebrow: "Vos travaux dans le 83 et le 06",
+  heroPanelTitle: "Préparer le terrain, raccorder les réseaux et aménager les accès.",
+  heroPanelItems: ["Terrassement et préparation des sols", "Réseaux secs et humides", "Voirie et aménagements extérieurs"],
+  homeActivitiesTitle: "Terrassement, réseaux et voirie : les travaux que nous réalisons.",
   homeActivitiesText:
-    "Le site est structuré autour des métiers FRTP : terrassement, VRD, réseaux, assainissement, voirie et aménagements extérieurs.",
-  homeProjectsTitle: "Chantiers récents et interventions documentées.",
+    "Terrassement, réseaux enterrés, parkings et accès : consultez le détail de nos prestations.",
+  homeProjectsTitle: "Nos chantiers dans le Var et les Alpes-Maritimes.",
   homeProjectsText:
-    "Les cartes chantier mettent les photos en premier, puis la commune, la catégorie et l'intervention réalisée.",
+    "Voirie, réseaux, soutènement et aménagements extérieurs.",
   reviewsEyebrow: "Avis Google",
-  reviewsTitle: "Des retours clients qui comptent autant que les photos de chantier.",
+  reviewsTitle: "Les avis de nos clients",
   reviewsText:
-    "Les avis affichés ici sont repris depuis la fiche Google FRTP et peuvent être mis à jour depuis le Studio.",
+    "Consultez les témoignages de nos clients sur la fiche Google FRTP.",
   reviewsRating: "",
   reviewsCount: "Avis Google",
-  reviewsGoogleUrl: "https://www.google.com/search?q=FRTP+Fréjus+avis+Google",
+  reviewsGoogleUrl: "https://www.google.com/maps?cid=5562041291635957611",
   reviews: [],
   homeCtaTitle: "Un chantier à chiffrer dans le Var ou les Alpes-Maritimes ?",
-  companyTitle: "Une société de travaux publics implantée localement.",
+  companyTitle: "FRTP, entreprise de travaux publics dans le Var et les Alpes-Maritimes.",
   companyIntro:
-    "FRTP est une société de travaux publics spécialisée dans les travaux de terrassement, VRD, assainissement, voirie et aménagements extérieurs.",
+    "FRTP est une entreprise de travaux publics basée à Fréjus. Nous intervenons dans le Var et les Alpes-Maritimes pour les travaux de terrassement, de voirie et réseaux divers, d’assainissement, de réseaux secs et humides, d’aménagements extérieurs, de soutènement et de démolition ciblée. Nos prestations s’adressent aux particuliers, aux copropriétés, aux entreprises et aux collectivités.",
   companyImage: "/chantier/les-chenes.jpg",
   companyCards: [
     {
-      title: "Implantation locale",
-      text: "Basée à Fréjus, l'entreprise intervient principalement dans le Var et les Alpes-Maritimes."
+      title: "Travaux dans le Var et les Alpes-Maritimes",
+      text: "Basée à Fréjus, FRTP propose l’ensemble de ses prestations dans les deux départements."
     },
     {
-      title: "Savoir-faire terrain",
-      text: "Les interventions sont pensées pour les contraintes d'accès, les réseaux existants et les sites occupés."
+      title: "Terrassement, voirie et VRD",
+      text: "Préparation des terrains, fouilles, tranchées, fonds de forme, accès, parkings, bordures et revêtements."
     },
     {
-      title: "Moyens humains et matériels",
-      text: "Organisation simple, réactive et adaptée aux chantiers de particuliers, syndics, professionnels et collectivités."
+      title: "Réseaux et assainissement",
+      text: "Réseaux d’eau potable, d’eaux usées et pluviales, fourreaux télécom et électriques, regards, caniveaux et raccordements."
     },
     {
-      title: "Engagements",
-      text: "Sérieux, sécurité, qualité d'exécution et suivi clair de chaque demande."
+      title: "Aménagements extérieurs et soutènement",
+      text: "Cours, cheminements, pavage, abords, reprise de niveaux et ouvrages de soutènement."
     }
   ],
   companyPillars: ["Exécution technique", "Moyens chantier", "Sécurité", "Proximité"],
@@ -126,14 +126,16 @@ export const defaultStudioSettings: StudioSettings = {
     "Saint-Raphaël",
     "Roquebrune-sur-Argens",
     "Puget-sur-Argens",
+    "La Croix-Valmer",
+    "Puget-Théniers",
     "Le Cannet",
     "Cannes",
     "Alpes-Maritimes",
     "Var"
   ],
-  methodTitle: "Une lecture claire du chantier avant l'intervention.",
+  methodTitle: "Avant les travaux",
   methodText:
-    "Le site doit montrer la même rigueur que l'entreprise : diagnostic, organisation, exécution, contrôle et preuve photo.",
+    "Les accès, les niveaux et les ouvrages existants déterminent la préparation des travaux et les étapes d’intervention.",
   methodSteps: [
     { number: "01", title: "Repérage", text: "Contraintes d'accès, réseaux existants, volumes et sécurité." },
     { number: "02", title: "Préparation", text: "Choix du matériel, planning, protection des zones sensibles." },
@@ -142,7 +144,7 @@ export const defaultStudioSettings: StudioSettings = {
   ],
   activitiesPageTitle: "Terrassement, VRD, réseaux, voirie et aménagements.",
   activitiesPageText:
-    "Chaque activité dispose d'une page claire avec prestations, exemples d'intervention et lien vers les chantiers associés.",
+    "FRTP réalise des travaux de terrassement, de voirie, de réseaux et d’assainissement dans le Var et les Alpes-Maritimes.",
   activities: defaultActivities.map((activity) => ({
     slug: activity.slug,
     title: activity.title,
@@ -151,16 +153,16 @@ export const defaultStudioSettings: StudioSettings = {
     interventionExample:
       "Analyse du besoin, repérage des contraintes, organisation des accès, exécution des travaux et remise en état de la zone d'intervention."
   })),
-  projectsPageTitle: "Des chantiers présentés par commune, catégorie et intervention.",
-  projectsPageText: "Découvrez des chantiers FRTP présentés par commune, métier et type d'intervention.",
+  projectsPageTitle: "Chantiers réalisés dans le Var et les Alpes-Maritimes.",
+  projectsPageText: "Voirie, réseaux, soutènement et aménagements extérieurs réalisés dans le Var et les Alpes-Maritimes.",
   newsPageTitle: "Actualités FRTP.",
-  newsPageText: "Retrouvez les dernières informations de l'entreprise, les chantiers récents et les interventions réalisées sur le terrain.",
-  beforeAfterTitle: "Montrer le terrain, pas seulement le discours.",
+  newsPageText: "Informations et archives de l’entreprise FRTP. Pour suivre les travaux réalisés, consultez nos réalisations.",
+  beforeAfterTitle: "Nos interventions en photos, avant et après les travaux.",
   beforeAfterText:
-    "La page avant / après est prévue pour comparer les photos de chantier par phase : avant, pendant et après intervention.",
+    "Comparez l’état initial et le résultat des travaux.",
   beforeImage: "/chantier/bastide-jessica.jpeg",
   afterImage: "/chantier/park-sainte-estelle.jpg",
-  contactTitle: "Décrivez votre chantier, FRTP reprend contact.",
+  contactTitle: "Demander un devis",
   contactPageText: "Présentez votre besoin en quelques lignes : FRTP étudie votre demande et vous recontacte pour préciser le chantier.",
   contactText:
     "Indiquez la commune, le type de travaux, les contraintes d'accès, le niveau d'urgence et les photos disponibles.",

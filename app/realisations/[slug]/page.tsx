@@ -10,6 +10,7 @@ import { getProjectForSite } from "@/lib/server-data";
 import { breadcrumbJsonLd, projectJsonLd } from "@/lib/structured-data";
 import { activitySlugForCategory } from "@/lib/project-categories";
 import { ProjectWorksList } from "@/components/ProjectWorksList";
+import { RichText } from "@/components/RichText";
 
 export const revalidate = 60;
 
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: `${project.title} - ${project.city}`,
+    title: `${project.title} - ${project.city}${project.departmentCode ? ` (${project.departmentCode})` : ""}`,
     description: project.short,
     alternates: { canonical: `/realisations/${project.slug}` },
     openGraph: {
@@ -119,7 +120,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             {project.short}
           </p>
           <div data-hero-line className="mt-6 flex flex-col gap-3 text-sm font-bold text-zinc-100 sm:flex-row sm:flex-wrap md:gap-4">
-            <span className="inline-flex items-center gap-2"><MapPin size={18} />{project.city}</span>
+            <span className="inline-flex items-center gap-2"><MapPin size={18} />{project.city}{project.departmentName ? `, ${project.departmentName} (${project.departmentCode})` : ""}</span>
             <span className="inline-flex items-center gap-2"><CalendarDays size={18} />{project.date}</span>
             <span className="inline-flex items-center gap-2"><Images size={18} />{galleryImages.length} {photoLabel}</span>
           </div>
@@ -130,6 +131,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.45fr_0.55fr] lg:items-start">
           <div data-gsap className="project-detail-copy">
             <p className="project-detail-eyebrow">Le chantier</p>
+            {project.description ? <div className="mb-10"><h2>Notre intervention à {project.city}</h2><RichText content={project.description} /></div> : null}
             <h2>Problématique initiale</h2>
             <p>{project.problem}</p>
 
@@ -141,7 +143,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <div className="project-detail-facts">
               <div>
                 <span>Localisation</span>
-                <strong>{project.city}</strong>
+                <strong>{project.city}{project.departmentName ? `, ${project.departmentName} (${project.departmentCode})` : ""}</strong>
               </div>
               <div>
                 <span>Année</span>

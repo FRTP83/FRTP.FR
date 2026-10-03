@@ -10,6 +10,7 @@ import { getActivitiesForSite, getProjectsForSite } from "@/lib/server-data";
 import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/structured-data";
 import { categoryMatchesActivity } from "@/lib/project-categories";
 import { activitySeoContent } from "@/lib/seo-content";
+import { serviceAreas } from "@/lib/service-areas";
 
 export const revalidate = 60;
 
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: `${activity.title} à Fréjus et dans le Var`,
+    title: `${activity.title} dans le Var (83) et les Alpes-Maritimes (06)`,
     description: `${activity.description} FRTP intervient à Fréjus, dans le Var et les Alpes-Maritimes.`,
     alternates: { canonical: `/activites/${activity.slug}` },
     openGraph: {
@@ -66,7 +67,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
         data={[
           breadcrumbJsonLd([
             { name: "Accueil", path: "/" },
-            { name: "Activités", path: "/activites" },
+            { name: "Prestations", path: "/activites" },
             { name: activity.title, path: `/activites/${activity.slug}` }
           ]),
           serviceJsonLd(activity),
@@ -78,18 +79,18 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
           <div>
             <Link href="/activites" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-zinc-300 transition hover:text-white">
               <ArrowLeft size={16} />
-              Toutes les activités
+              Toutes les prestations
             </Link>
             <div className="mt-8 inline-flex items-center gap-3">
               <span className="activity-detail-icon">
                 <Icon size={30} />
               </span>
               <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.22em] text-blue-200 md:text-xs">
-                Activité
+                Prestation
               </p>
             </div>
             <h1 className="mt-5 max-w-4xl font-display text-[2.75rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
-              {seoContent?.heading ?? `${activity.title} à Fréjus et dans le Var`}
+              {seoContent?.heading ?? `${activity.title} dans le Var et les Alpes-Maritimes`}
             </h1>
             <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
               {activity.description}
@@ -124,7 +125,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
                   <Link href="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 bg-frtp-orange px-5 py-3 text-sm font-black text-white">
                     Demander un devis <ArrowRight size={17} />
                   </Link>
-                  <Link href="/zones-intervention" className="inline-flex min-h-12 items-center gap-2 px-1 font-black text-frtp-blue">
+                  <Link href="/activites#zones-intervention" className="inline-flex min-h-12 items-center gap-2 px-1 font-black text-frtp-blue">
                     Voir la zone d'intervention <ArrowRight size={17} />
                   </Link>
                 </div>
@@ -140,7 +141,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
             </div>
           ) : null}
           <div>
-            <SectionHeading eyebrow="Chantiers associés" title="Quelques références proches de cette activité." />
+            <SectionHeading eyebrow="Chantiers associés" title="Nos réalisations" />
             <div className="activity-detail-related-grid mt-8 md:mt-10">
             {related.length ? (
               related.map((project) => (
@@ -158,7 +159,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
                   </span>
                   <span className="activity-detail-project-content">
                     <span className="activity-detail-project-meta">
-                      <span><MapPin size={15} />{project.city}</span>
+                      <span><MapPin size={15} />{project.city}{project.departmentCode ? ` (${project.departmentCode})` : ""}</span>
                       <span><CalendarDays size={15} />{project.date}</span>
                     </span>
                     <span className="activity-detail-project-title">{project.title}</span>
@@ -173,13 +174,16 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
               </p>
             )}
             </div>
+            <nav aria-label="Zones d’intervention" className="mt-6 flex flex-wrap gap-3">
+              {serviceAreas.map(area => <Link key={area.slug} href={`/zones-intervention/${area.slug}`} className="inline-flex items-center gap-2 border border-zinc-300 bg-white px-4 py-3 text-sm font-bold text-frtp-blue">Zone d’intervention : {area.name} ({area.code}) <ArrowRight size={16} /></Link>)}
+            </nav>
           </div>
 
           {seoContent ? (
             <div className="mt-12 grid gap-10 border-t border-zinc-300 pt-12 md:mt-16 md:grid-cols-2 md:pt-16">
               <section>
                 <p className="border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-frtp-blue">Déroulement</p>
-                <h2 className="mt-4 font-display text-3xl font-bold text-zinc-950">Un chantier préparé étape par étape</h2>
+                <h2 className="mt-4 font-display text-3xl font-bold text-zinc-950">Les étapes du chantier</h2>
                 <ol className="mt-7 grid gap-5">
                   {seoContent.process.map((step, index) => (
                     <li key={step.title} className="grid grid-cols-[2rem_1fr] gap-3">

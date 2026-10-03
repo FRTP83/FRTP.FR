@@ -7,7 +7,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Entreprise",
+  title: "Entreprise de travaux publics dans le Var et les Alpes-Maritimes",
   description: "FRTP, société de travaux publics implantée à Fréjus : terrassement, VRD, assainissement, voirie et aménagements extérieurs dans le Var et les Alpes-Maritimes.",
   path: "/entreprise"
 });
@@ -63,7 +63,7 @@ export default async function CompanyPage() {
 
           <div className="company-index-area mt-10 md:mt-14">
             <p className="project-detail-eyebrow">Zone d'intervention</p>
-            <h2>Un ancrage local, des interventions dans le Var et les Alpes-Maritimes.</h2>
+            <h2>Nos zones d’intervention dans le Var et les Alpes-Maritimes.</h2>
             <div className="mt-5 flex flex-wrap gap-2">
               {studio.serviceArea.map((area) => (
                 <span key={area}>

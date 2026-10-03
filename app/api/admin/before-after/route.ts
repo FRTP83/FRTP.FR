@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { defaultBeforeAfterItems, type BeforeAfterItem } from "@/lib/before-after";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { slugify } from "@/lib/utils";
 import { hasAdminAccess } from "@/lib/admin-access";
 import { normalizeCopyObject } from "@/lib/french-copy";
+import { validateLocation } from "@/lib/geography-server";
 
 export async function GET(request: Request) {
   const supabase = getSupabaseAdmin();
@@ -48,6 +50,12 @@ export async function POST(request: Request) {
   const count = Math.max(0, Number(formData.get("itemsLength") ?? 0) || 0);
   const items: BeforeAfterItem[] = [];
 
+  const locations = [];
+  try {
+    for (let index = 0; index < count; index += 1) locations.push(validateLocation(String(formData.get(`itemDepartmentCode${index}`) ?? ""), String(formData.get(`itemCityCode${index}`) ?? "")));
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Localisation invalide." }, { status: 400 });
+  }
   await supabase.storage.createBucket("site-assets", { public: true }).catch(() => null);
 
   for (let index = 0; index < count; index += 1) {
@@ -59,7 +67,7 @@ export async function POST(request: Request) {
     items.push({
       id,
       title,
-      city: stringValue(formData, `itemCity${index}`, "Frejus"),
+      ...locations[index],
       category: stringValue(formData, `itemCategory${index}`, "Travaux publics"),
       before: await uploadOptionalImage(formData.get(`itemBefore${index}`), currentBefore, `before-after/${id}/before`, title),
       after: await uploadOptionalImage(formData.get(`itemAfter${index}`), currentAfter, `before-after/${id}/after`, title),
@@ -80,6 +88,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  revalidatePath("/avant-apres");
+  revalidatePath("/zones-intervention/[slug]", "page");
+  revalidatePath("/");
   return NextResponse.json({ items: orderedItems });
 }
 

@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Réalisations",
+  title: "Chantiers de terrassement et VRD dans le Var et les Alpes-Maritimes",
   description: "Chantiers récents de FRTP : terrassement, VRD et aménagements extérieurs dans le Var et les Alpes-Maritimes, présentés par commune et catégorie.",
   path: "/realisations"
 });

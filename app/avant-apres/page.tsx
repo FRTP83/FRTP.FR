@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Avant / Après",
+  title: "Chantiers avant et après travaux dans le Var et les Alpes-Maritimes",
   description: "Comparez les photos de chantier FRTP avant et après intervention : terrassement, VRD et aménagements extérieurs dans le Var et les Alpes-Maritimes.",
   path: "/avant-apres"
 });
