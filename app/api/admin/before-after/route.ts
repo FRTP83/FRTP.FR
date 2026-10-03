@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { refreshPublicContent } from "@/lib/publication";
 import { defaultBeforeAfterItems, type BeforeAfterItem } from "@/lib/before-after";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { slugify } from "@/lib/utils";
@@ -88,9 +88,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  revalidatePath("/avant-apres");
-  revalidatePath("/zones-intervention/[slug]", "page");
-  revalidatePath("/");
+  refreshPublicContent();
   return NextResponse.json({ items: orderedItems });
 }
 

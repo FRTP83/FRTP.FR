@@ -66,7 +66,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
-  if (error || !data?.length) {
+  if (error || !data) {
     return fallbackProjects;
   }
 
@@ -153,7 +153,6 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
 export async function getProjectForSite(slug: string): Promise<SiteProject | null> {
   const allProjects = await getProjectsForSite();
   return allProjects.find((project) => project.slug === slug)
-    ?? fallbackProjects.find((project) => project.slug === slug)
     ?? null;
 }
 
@@ -170,7 +169,7 @@ export async function getNewsForSite(): Promise<SiteNews[]> {
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
-  if (error || !data?.length) {
+  if (error || !data) {
     return fallbackNews;
   }
 

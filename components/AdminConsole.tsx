@@ -263,6 +263,21 @@ export function AdminConsole() {
     setNotice("");
   }
 
+  async function publishPublicChanges() {
+    if (!supabase) return false;
+    const session = await supabase.auth.getSession();
+    const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
+    const response = token ? await fetch("/api/admin/publish", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` }
+    }).catch(() => null) : null;
+    if (!response?.ok) {
+      setNotice("Modification enregistrée, mais l’actualisation du site a échoué. Reconnectez-vous puis réessayez l’enregistrement.");
+      return false;
+    }
+    return true;
+  }
+
   async function saveProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!supabase) return;
@@ -304,25 +319,31 @@ export function AdminConsole() {
       return;
     }
 
+    setSelectedProjectId(result.id);
     const image = formData.get("image") as File | null;
     if (image && image.size > 0) {
-      await uploadProjectImage(result.id, image, "gallery", title, 0);
+      if (!(await uploadProjectImage(result.id, image, "gallery", title, 0))) {
+        await refreshAdminData();
+        return;
+      }
     }
 
-    await saveProjectHeroSettings(result.id, heroSettingsFromForm(formData));
+    if (!(await saveProjectHeroSettings(result.id, heroSettingsFromForm(formData)))) {
+      await refreshAdminData();
+      return;
+    }
 
-    setSelectedProjectId(result.id);
     setNotice(selectedProject ? "Chantier modifié." : "Chantier ajouté.");
     await refreshAdminData();
   }
 
   async function uploadProjectImage(projectId: string, image: File, imageType: ImageType, caption: string, sortOrder: number) {
-    if (!supabase) return;
+    if (!supabase) return false;
     const filePath = `projects/${projectId}/${Date.now()}-${slugify(image.name)}`;
     const upload = await supabase.storage.from("project-images").upload(filePath, image);
     if (upload.error) {
       setNotice(upload.error.message);
-      return;
+      return false;
     }
 
     const publicUrl = supabase.storage.from("project-images").getPublicUrl(filePath);
@@ -334,18 +355,22 @@ export function AdminConsole() {
       sort_order: sortOrder
     });
 
-    if (error) setNotice(error.message);
+    if (error) {
+      setNotice(error.message);
+      return false;
+    }
+    return publishPublicChanges();
   }
 
   async function saveProjectHeroSettings(projectId: string, settings: ProjectHeroSettings) {
-    if (!supabase) return;
+    if (!supabase) return false;
 
     const session = await supabase.auth.getSession();
     const token = isLocalPreview ? "local-preview" : session.data.session?.access_token;
 
     if (!token) {
       setNotice("Session admin expiree. Reconnectez-vous.");
-      return;
+      return false;
     }
 
     const response = await fetch("/api/admin/project-hero-settings", {
@@ -355,17 +380,18 @@ export function AdminConsole() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ projectId, settings })
-    });
-    const data = await response.json().catch(() => null);
+    }).catch(() => null);
+    const data = await response?.json().catch(() => null);
 
-    if (!response.ok) {
+    if (!response?.ok) {
       setNotice(data?.error ?? "Reglages bandeau non enregistres.");
-      return;
+      return false;
     }
 
     if (data?.settings) {
       setProjectHeroSettings(data.settings as ProjectHeroSettingsMap);
     }
+    return true;
   }
 
   function updateLocalProjectHeroSettings(projectId: string, settings: ProjectHeroSettings) {
@@ -388,15 +414,17 @@ export function AdminConsole() {
     }
 
     setLoading(true);
-    await uploadProjectImage(
+    const saved = await uploadProjectImage(
       selectedProject.id,
       image,
       String(formData.get("image_type")) as ImageType,
       String(formData.get("caption") || selectedProject.title),
       Number(formData.get("sort_order") || 0)
     );
-    form.reset();
-    setNotice("Photo ajoutee au chantier.");
+    if (saved) {
+      form.reset();
+      setNotice("Photo ajoutée au chantier.");
+    }
     await refreshAdminData();
   }
 
@@ -404,6 +432,10 @@ export function AdminConsole() {
     if (!supabase) return;
     setLoading(true);
     const { error } = await supabase.from("project_images").delete().eq("id", imageId);
+    if (!error && !(await publishPublicChanges())) {
+      await refreshAdminData();
+      return;
+    }
     setNotice(error ? error.message : "Photo supprimée.");
     await refreshAdminData();
   }
@@ -412,6 +444,10 @@ export function AdminConsole() {
     if (!supabase) return;
     setLoading(true);
     const { error } = await supabase.from("project_images").update(values).eq("id", imageId);
+    if (!error && !(await publishPublicChanges())) {
+      await refreshAdminData();
+      return;
+    }
     setNotice(error ? error.message : "Photo mise a jour.");
     await refreshAdminData();
   }
@@ -429,6 +465,10 @@ export function AdminConsole() {
       )
     );
     const error = updates.find((result) => result.error)?.error;
+    if (updates.some(result => !result.error) && !(await publishPublicChanges())) {
+      await refreshAdminData();
+      return;
+    }
     setNotice(error ? error.message : "Ordre des photos mis a jour.");
     await refreshAdminData();
   }
@@ -501,6 +541,10 @@ export function AdminConsole() {
     }
 
     setSelectedNewsId(result.data.id);
+    if (!(await publishPublicChanges())) {
+      await refreshAdminData();
+      return;
+    }
     setNotice(selectedNews ? "Actualité modifiée." : "Actualité ajoutée.");
     await refreshAdminData();
   }
@@ -509,6 +553,10 @@ export function AdminConsole() {
     if (!supabase) return;
     setLoading(true);
     const { error } = await supabase.from("news").delete().eq("id", newsId);
+    if (!error && !(await publishPublicChanges())) {
+      await refreshAdminData();
+      return;
+    }
     setNotice(error ? error.message : "Actualité supprimée.");
     setSelectedNewsId("new");
     await refreshAdminData();
@@ -544,10 +592,10 @@ export function AdminConsole() {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    });
-    const data = await response.json().catch(() => null);
+    }).catch(() => null);
+    const data = await response?.json().catch(() => null);
 
-    if (!response.ok) {
+    if (!response?.ok) {
       setNotice(data?.error ?? "Studio non enregistré.");
       setLoading(false);
       return;
@@ -580,10 +628,10 @@ export function AdminConsole() {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    });
-    const data = await response.json().catch(() => null);
+    }).catch(() => null);
+    const data = await response?.json().catch(() => null);
 
-    if (!response.ok) {
+    if (!response?.ok) {
       setNotice(data?.error ?? "Avant / Apres non enregistre.");
       setLoading(false);
       return;
@@ -704,13 +752,16 @@ export function AdminConsole() {
                 onSubmit={addProjectPhoto}
                 onDelete={deleteProjectImage}
                 onUpdate={updateProjectImage}
-                onSetHeroImage={(imageUrl) => {
+                onSetHeroImage={async (imageUrl) => {
+                  setLoading(true);
                   const nextSettings = normalizeProjectHeroSettings({
                     ...selectedProjectHeroSettings,
                     imageUrl
                   });
-                  updateLocalProjectHeroSettings(selectedProject.id, nextSettings);
-                  saveProjectHeroSettings(selectedProject.id, nextSettings);
+                  if (await saveProjectHeroSettings(selectedProject.id, nextSettings)) {
+                    setNotice("Image principale enregistrée.");
+                  }
+                  await refreshAdminData();
                 }}
                 onReorder={reorderProjectImages}
                 loading={loading}

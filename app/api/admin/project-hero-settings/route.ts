@@ -7,6 +7,7 @@ import {
 } from "@/lib/project-hero";
 import { hasAdminAccess } from "@/lib/admin-access";
 import { normalizeCopyObject } from "@/lib/french-copy";
+import { refreshPublicContent } from "@/lib/publication";
 
 const settingsKey = "project_hero_settings";
 
@@ -81,6 +82,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  refreshPublicContent();
   return NextResponse.json({ settings: settingsMap });
 }
 

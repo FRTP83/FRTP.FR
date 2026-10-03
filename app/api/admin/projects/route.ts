@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { refreshPublicContent } from "@/lib/publication";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { hasAdminAccess } from "@/lib/admin-access";
 import { validateLocation } from "@/lib/geography-server";
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       const removed = await supabase.from("project_category_links").delete().eq("project_id", result.data.id).eq("category_id", link.category_id);
       if (removed.error) throw new Error(removed.error.message);
     }
-    refreshProjectPages();
+    refreshPublicContent();
     return Response.json({ id: result.data.id });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "Chantier non enregistré." }, { status: 400 });
@@ -72,19 +72,9 @@ export async function DELETE(request: Request) {
     const removed = await supabase.from("projects").delete().eq("id", id).select("id").maybeSingle();
     if (removed.error) throw new Error(removed.error.message);
     if (!removed.data) return Response.json({ error: "Chantier introuvable." }, { status: 404 });
-    refreshProjectPages();
+    refreshPublicContent();
     return Response.json({ id: removed.data.id });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "Chantier non supprimé." }, { status: 400 });
   }
-}
-
-function refreshProjectPages() {
-  revalidatePath("/activites");
-  revalidatePath("/zones-intervention/[slug]", "page");
-  revalidatePath("/realisations");
-  revalidatePath("/realisations/[slug]", "page");
-  revalidatePath("/activites/[slug]", "page");
-  revalidatePath("/");
-  revalidatePath("/sitemap.xml");
 }

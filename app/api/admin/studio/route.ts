@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { refreshPublicContent } from "@/lib/publication";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { defaultStudioSettings, type StudioSettings } from "@/lib/studio";
 import { slugify } from "@/lib/utils";
@@ -167,8 +167,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  revalidatePath("/", "layout");
-  revalidatePath("/sitemap.xml");
+  refreshPublicContent();
   return NextResponse.json({ settings: nextSettings });
 }
 
