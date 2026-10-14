@@ -22,11 +22,11 @@ export default async function NewsPage() {
       <div className="dark-panel px-4 pb-14 pt-12 text-white md:px-6 md:pb-20 md:pt-18">
         <div className="mx-auto max-w-7xl">
           <p className="inline-flex border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-blue-200 md:text-xs md:tracking-[0.24em]">Informations FRTP</p>
-          <h1 className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
+          <h1 data-studio-field="newsPageTitle" className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
             {studio.newsPageTitle}
           </h1>
           {studio.newsPageText ? (
-            <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
+            <p data-studio-field="newsPageText" className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
               {studio.newsPageText}
             </p>
           ) : null}

@@ -21,7 +21,7 @@ export default async function CompanyPage() {
       <div className="dark-panel px-4 pb-14 pt-12 text-white md:px-6 md:pb-20 md:pt-18">
         <div className="mx-auto max-w-7xl">
           <p className="inline-flex border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-blue-200 md:text-xs md:tracking-[0.24em]">L'entreprise</p>
-          <h1 className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
+          <h1 data-studio-field="companyTitle" className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
             {studio.companyTitle}
           </h1>
           {studio.companyIntro ? (
@@ -36,7 +36,7 @@ export default async function CompanyPage() {
         <div className="mx-auto max-w-7xl">
           <div className="company-index-layout">
             <div className="company-index-image">
-              <Image src={studio.companyImage} alt="Intervention FRTP" fill sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover" />
+              <Image src={studio.companyImage} data-studio-field="companyImage" alt="Intervention FRTP" fill sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover" />
             </div>
             <div className="company-index-cards">
               {studio.companyCards.map(({ title, text }) => (

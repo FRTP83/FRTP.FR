@@ -20,11 +20,11 @@ export default async function BeforeAfterPage() {
         <div className="mx-auto max-w-7xl">
           <p className="inline-flex border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-blue-200 md:text-xs md:tracking-[0.24em]">Avant / Après</p>
           <div className="mt-5">
-            <h1 className="max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
+            <h1 data-studio-field="beforeAfterTitle" className="max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
               {studio.beforeAfterTitle}
             </h1>
             {studio.beforeAfterText ? (
-              <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
+              <p data-studio-field="beforeAfterText" className="mt-5 max-w-3xl text-base font-semibold leading-8 text-zinc-300 md:text-xl">
                 {studio.beforeAfterText}
               </p>
             ) : null}

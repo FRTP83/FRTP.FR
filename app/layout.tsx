@@ -7,6 +7,7 @@ import "@/app/activity-theme.css";
 import { GsapPageEffects } from "@/components/GsapPageEffects";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { StudioPreviewReady } from "@/components/StudioPreviewReady";
 import { StructuredData } from "@/components/StructuredData";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, localBusinessJsonLd, websiteJsonLd } from "@/lib/site";
 
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
       {/* Audience tracking requires prior consent and matching privacy information. */}
       <body className="font-sans antialiased">
+        <StudioPreviewReady />
         <a href="#main-content" className="skip-link">
           Aller au contenu principal
         </a>

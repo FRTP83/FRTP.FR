@@ -22,7 +22,7 @@ export default async function HomePage() {
         <div className="absolute inset-0">
           <Image
             data-hero-image
-            src={studio.heroImage}
+            src={studio.heroImage} data-studio-field="heroImage"
             alt="Chantier FRTP"
             fill
             sizes="100vw"
@@ -39,10 +39,10 @@ export default async function HomePage() {
             <div data-hero-line className="mb-5 inline-flex max-w-full items-center gap-3 border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur md:mb-8 md:px-4 md:text-xs md:tracking-[0.22em]">
               {studio.heroEyebrow}
             </div>
-            <h1 data-hero-line className="text-balance max-w-4xl font-display text-[2.85rem] font-bold leading-[0.96] tracking-tight md:text-7xl md:leading-[0.92]">
+            <h1 data-studio-field="heroTitle" data-hero-line className="text-balance max-w-4xl font-display text-[2.85rem] font-bold leading-[0.96] tracking-tight md:text-7xl md:leading-[0.92]">
               {studio.heroTitle}
             </h1>
-            <p data-hero-line className="mt-5 max-w-2xl text-base font-medium leading-7 text-zinc-100 md:mt-7 md:text-xl md:leading-8">
+            <p data-studio-field="heroSubtitle" data-hero-line className="mt-5 max-w-2xl text-base font-medium leading-7 text-zinc-100 md:mt-7 md:text-xl md:leading-8">
               {studio.heroSubtitle}
             </p>
             <div data-hero-line className="mt-7 flex flex-col gap-3 sm:flex-row md:mt-9">
@@ -65,8 +65,8 @@ export default async function HomePage() {
 
           <div data-hero-line className="hidden md:block">
             <div data-parallax-slow className="ml-auto max-w-sm border border-white/12 bg-frtp-graphite/96 p-6 text-white shadow-lifted backdrop-blur-xl">
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">{studio.heroPanelEyebrow}</p>
-              <p className="mt-4 font-display text-2xl font-bold leading-tight text-white">
+              <p data-studio-field="heroPanelEyebrow" className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">{studio.heroPanelEyebrow}</p>
+              <p data-studio-field="heroPanelTitle" className="mt-4 font-display text-2xl font-bold leading-tight text-white">
                 {studio.heroPanelTitle}
               </p>
               <div className="mt-6 grid gap-3 text-sm font-semibold text-zinc-200">
@@ -87,7 +87,7 @@ export default async function HomePage() {
         <div className="method-route mx-auto max-w-7xl">
           <div data-gsap className="method-route-intro">
             <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">Méthode terrain</p>
-            <h2 className="mt-3 max-w-2xl text-[1.8rem] font-black leading-[1.02] tracking-tight text-white md:text-4xl">
+            <h2 data-studio-field="methodTitle" className="mt-3 max-w-2xl text-[1.8rem] font-black leading-[1.02] tracking-tight text-white md:text-4xl">
               {studio.methodTitle}
             </h2>
           </div>
@@ -110,8 +110,8 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Activités"
-            title={studio.homeActivitiesTitle}
-            text={studio.homeActivitiesText}
+            title={studio.homeActivitiesTitle} studioTitle="homeActivitiesTitle"
+            text={studio.homeActivitiesText} studioText="homeActivitiesText"
           />
           <HomeActivityExplorer activities={activities} projects={projects} heading={studio.homeActivitiesTitle} />
         </div>
@@ -122,8 +122,8 @@ export default async function HomePage() {
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <SectionHeading
               eyebrow="Réalisations"
-              title={studio.homeProjectsTitle}
-              text={studio.homeProjectsText}
+              title={studio.homeProjectsTitle} studioTitle="homeProjectsTitle"
+              text={studio.homeProjectsText} studioText="homeProjectsText"
             />
             <Link href="/realisations" className="inline-flex min-h-11 items-center gap-2 font-black text-frtp-blue">
               Toutes les réalisations <ArrowRight size={18} />
@@ -166,8 +166,8 @@ export default async function HomePage() {
           <div>
             <SectionHeading
               eyebrow="Avant / Après"
-              title={studio.beforeAfterTitle}
-              text={studio.beforeAfterText}
+              title={studio.beforeAfterTitle} studioTitle="beforeAfterTitle"
+              text={studio.beforeAfterText} studioText="beforeAfterText"
             />
             <Link
               href="/avant-apres"
@@ -186,15 +186,15 @@ export default async function HomePage() {
           <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
             <div>
               <SectionHeading
-                eyebrow={studio.reviewsEyebrow}
-                title={studio.reviewsTitle}
-                text={studio.reviewsText}
+                eyebrow={studio.reviewsEyebrow} studioEyebrow="reviewsEyebrow"
+                title={studio.reviewsTitle} studioTitle="reviewsTitle"
+                text={studio.reviewsText} studioText="reviewsText"
               />
               <div className="mt-7 inline-flex w-full items-center justify-between gap-4 border border-zinc-200 bg-white px-5 py-4 shadow-technical sm:w-auto md:mt-8">
-                <span className="font-display text-3xl font-black text-frtp-blue md:text-4xl">{studio.reviewsRating}</span>
+                <span data-studio-field="reviewsRating" className="font-display text-3xl font-black text-frtp-blue md:text-4xl">{studio.reviewsRating}</span>
                 <span className="grid gap-1">
                   <RatingStars rating={studio.reviewsRating} size={17} />
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">{studio.reviewsCount}</span>
+                  <span data-studio-field="reviewsCount" className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">{studio.reviewsCount}</span>
                 </span>
               </div>
             </div>
@@ -224,7 +224,7 @@ export default async function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-8 md:flex-row md:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">Contact rapide</p>
-            <h2 className="mt-3 max-w-2xl text-2xl font-black tracking-tight text-zinc-950 md:text-5xl">
+            <h2 data-studio-field="homeCtaTitle" className="mt-3 max-w-2xl text-2xl font-black tracking-tight text-zinc-950 md:text-5xl">
               {studio.homeCtaTitle}
             </h2>
           </div>

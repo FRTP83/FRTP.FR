@@ -3,9 +3,10 @@ import type { ReactNode } from "react";
 type RichTextProps = {
   content: string;
   className?: string;
+  studioField?: string;
 };
 
-export function RichText({ content, className = "" }: RichTextProps) {
+export function RichText({ content, className = "", studioField }: RichTextProps) {
   const blocks = content
     .replace(/\r\n?/g, "\n")
     .split(/\n[ \t]*\n(?:[ \t]*\n)*/)
@@ -13,7 +14,7 @@ export function RichText({ content, className = "" }: RichTextProps) {
     .filter(Boolean);
 
   return (
-    <div className={["rich-text", className].filter(Boolean).join(" ")}>
+    <div data-studio-field={studioField} className={["rich-text", className].filter(Boolean).join(" ")}>
       {blocks.map((block, index) => (
         <RichBlock key={`${index}-${block.slice(0, 24)}`} block={block} />
       ))}

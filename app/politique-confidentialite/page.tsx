@@ -21,7 +21,7 @@ export default async function PrivacyPage() {
           <p className="inline-flex border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.22em] text-blue-200 md:text-xs">
             Données
           </p>
-          <h1 className="mt-5 max-w-4xl font-display text-[2.75rem] font-bold leading-[1.02] tracking-tight text-white md:text-6xl">
+          <h1 data-studio-field="privacyTitle" className="mt-5 max-w-4xl font-display text-[2.75rem] font-bold leading-[1.02] tracking-tight text-white md:text-6xl">
             {studio.privacyTitle}
           </h1>
         </div>

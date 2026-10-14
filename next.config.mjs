@@ -27,7 +27,7 @@ const nextConfig = {
       "default-src 'self'",
       "base-uri 'self'",
       "form-action 'self'",
-      "frame-ancestors 'none'",
+      "frame-ancestors 'self'",
       "object-src 'none'",
       `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV !== "production" ? "'unsafe-eval' " : ""}https://www.googletagmanager.com`,
       "style-src 'self' 'unsafe-inline'",
@@ -45,8 +45,15 @@ const nextConfig = {
           { key: "Content-Security-Policy", value: contentSecurityPolicy },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" }
+        ]
+      },
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "Content-Security-Policy", value: contentSecurityPolicy.replace("frame-ancestors 'self'", "frame-ancestors 'none'") },
+          { key: "X-Frame-Options", value: "DENY" }
         ]
       }
     ];

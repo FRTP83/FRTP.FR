@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { VisualStudio } from "@/components/VisualStudio";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   Edit3,
@@ -670,9 +672,10 @@ export function AdminConsole() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="studio-shell">
       {isLocalPreview ? <p className="border-l-4 border-frtp-orange bg-amber-50 p-4 text-sm font-semibold text-zinc-800">Prévisualisation locale. Les enregistrements restent sur cet ordinateur. Le site publié n’est pas modifié.</p> : null}
-      <div className="flex flex-col justify-between gap-4 border border-zinc-200 bg-white p-4 md:flex-row md:items-center">
+      <div className="studio-topbar">
+        <Link href="/" className="studio-brand"><span>FRTP</span><small>STUDIO</small></Link>
         <div className="flex flex-wrap gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -681,7 +684,8 @@ export function AdminConsole() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={activeTab === tab.id ? "inline-flex items-center gap-2 bg-zinc-950 px-4 py-3 text-sm font-black text-white" : "inline-flex items-center gap-2 bg-frtp-gray px-4 py-3 text-sm font-black text-zinc-700"}
+                aria-pressed={activeTab === tab.id}
+                className="studio-tab"
               >
                 <Icon size={18} />
                 {tab.label}
@@ -703,7 +707,8 @@ export function AdminConsole() {
 
       {notice ? <p className="border-l-4 border-frtp-blue bg-white p-4 text-sm font-semibold text-zinc-700">{notice}</p> : null}
 
-      {activeTab === "studio" ? (
+      <VisualStudio settings={studioSettings} activeTab={activeTab} onTab={setActiveTab} projects={projects} news={news} onProject={setSelectedProjectId} onNews={setSelectedNewsId} selectedProject={selectedProjectId} selectedNews={selectedNewsId} loading={loading}>
+      <div hidden={activeTab !== "studio"}>
         <StudioForm
           key={JSON.stringify(studioSettings)}
           settings={studioSettings}
@@ -711,7 +716,7 @@ export function AdminConsole() {
           onSubmit={saveStudio}
           loading={loading}
         />
-      ) : null}
+      </div>
 
       {activeTab === "beforeAfter" ? (
         <BeforeAfterForm
@@ -794,6 +799,7 @@ export function AdminConsole() {
       {activeTab === "requests" ? (
         <RequestsList requests={requests} onStatusChange={updateRequestStatus} />
       ) : null}
+      </VisualStudio>
     </div>
   );
 }
@@ -1099,17 +1105,9 @@ function StudioForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-6">
-      <section className="border border-zinc-200 bg-white p-6 shadow-technical">
-        <FormTitle icon={Settings2} title="Studio du site" />
-        <p className="mt-3 max-w-3xl leading-7 text-zinc-600">
-          Ces réglages pilotent les textes et les images globales des pages principales. Les chantiers, actualités et photos détaillées restent gérés dans leurs onglets dédiés.
-        </p>
-      </section>
-
-      <div className="grid gap-6 xl:grid-cols-2">
-        <section className="border border-zinc-200 bg-white p-6">
-          <h3 className="text-xl font-black text-zinc-950">Accueil - Hero</h3>
+    <form onSubmit={onSubmit} className="studio-settings-form">
+<div className="grid gap-6 xl:grid-cols-2">
+        <section data-studio-group="hero" className="border border-zinc-200 bg-white p-6"><h3 className="text-xl font-black text-zinc-950">Accueil - Hero</h3>
           <div className="mt-5 grid gap-5">
             <Field label="Surtitre" name="heroEyebrow" defaultValue={settings.heroEyebrow} />
             <Field label="Titre principal" name="heroTitle" defaultValue={settings.heroTitle} />
@@ -1121,15 +1119,14 @@ function StudioForm({
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6">
-          <h3 className="text-xl font-black text-zinc-950">Entreprise</h3>
+        <section data-studio-group="company" className="border border-zinc-200 bg-white p-6"><h3 className="text-xl font-black text-zinc-950">Entreprise</h3>
           <div className="mt-5 grid gap-5">
             <Field label="Titre page entreprise" name="companyTitle" defaultValue={settings.companyTitle} />
             <TextArea label="Texte de presentation" name="companyIntro" defaultValue={settings.companyIntro} />
             <ImageField label="Image entreprise" name="companyImage" src={settings.companyImage} />
             <input type="hidden" name="companyCardsLength" value={companyCardFields.length} />
             {companyCardFields.map((card, index) => (
-              <div key={`${index}-${card.title}`} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+              <div key={index} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
                 <ReorderControls
                   label={`Bloc entreprise ${index + 1}`}
                   onMoveUp={() => setCompanyCardFields((current) => moveArrayItem(current, index, -1))}
@@ -1146,14 +1143,13 @@ function StudioForm({
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6">
-          <h3 className="text-xl font-black text-zinc-950">Methode terrain</h3>
+        <section data-studio-group="method" className="border border-zinc-200 bg-white p-6"><h3 className="text-xl font-black text-zinc-950">Methode terrain</h3>
           <div className="mt-5 grid gap-5">
             <Field label="Titre" name="methodTitle" defaultValue={settings.methodTitle} />
             <TextArea label="Texte" name="methodText" defaultValue={settings.methodText} />
             <input type="hidden" name="methodStepsLength" value={methodStepFields.length} />
             {methodStepFields.map((step, index) => (
-              <div key={`${step.number}-${step.title}`} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+              <div key={index} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
                 <ReorderControls
                   label={`Etape ${index + 1}`}
                   onMoveUp={() => setMethodStepFields((current) => moveArrayItem(current, index, -1))}
@@ -1169,8 +1165,7 @@ function StudioForm({
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6">
-          <h3 className="text-xl font-black text-zinc-950">Avant / Après</h3>
+        <section data-studio-group="beforeAfter" className="border border-zinc-200 bg-white p-6"><h3 className="text-xl font-black text-zinc-950">Avant / Après</h3>
           <div className="mt-5 grid gap-5">
             <Field label="Titre" name="beforeAfterTitle" defaultValue={settings.beforeAfterTitle} />
             <TextArea label="Texte" name="beforeAfterText" defaultValue={settings.beforeAfterText} />
@@ -1179,12 +1174,11 @@ function StudioForm({
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6 xl:col-span-2">
-          <h3 className="text-xl font-black text-zinc-950">Accueil - sections et chiffres</h3>
+        <section data-studio-group="stats" className="border border-zinc-200 bg-white p-6 xl:col-span-2"><h3 className="text-xl font-black text-zinc-950">Accueil - sections et chiffres</h3>
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <input type="hidden" name="statsLength" value={statFields.length} />
             {statFields.map((stat, index) => (
-              <div key={`${stat.value}-${stat.label}`} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+              <div key={index} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
                 <ReorderControls
                   label={`Chiffre ${index + 1}`}
                   onMoveUp={() => setStatFields((current) => moveArrayItem(current, index, -1))}
@@ -1196,10 +1190,16 @@ function StudioForm({
                 <Field label={`Libelle ${index + 1}`} name={`statLabel${index}`} defaultValue={stat.label} />
               </div>
             ))}
+          </div></section>
+        <section data-studio-group="homeActivities" className="bg-white p-6"><h3>Activités à l’accueil</h3><div className="mt-5 grid gap-5">
             <Field label="Titre section activités accueil" name="homeActivitiesTitle" defaultValue={settings.homeActivitiesTitle} />
             <TextArea label="Texte section activités accueil" name="homeActivitiesText" defaultValue={settings.homeActivitiesText} />
+          </div></section>
+        <section data-studio-group="homeProjects" className="bg-white p-6"><h3>Réalisations à l’accueil</h3><div className="mt-5 grid gap-5">
             <Field label="Titre section réalisations accueil" name="homeProjectsTitle" defaultValue={settings.homeProjectsTitle} />
             <TextArea label="Texte section réalisations accueil" name="homeProjectsText" defaultValue={settings.homeProjectsText} />
+          </div></section>
+        <section data-studio-group="reviews" className="bg-white p-6"><h3>Avis clients</h3><div className="mt-5 grid gap-5">
             <Field label="Surtitre section avis" name="reviewsEyebrow" defaultValue={settings.reviewsEyebrow} />
             <Field label="Titre section avis" name="reviewsTitle" defaultValue={settings.reviewsTitle} />
             <TextArea label="Texte section avis" name="reviewsText" defaultValue={settings.reviewsText} />
@@ -1220,7 +1220,7 @@ function StudioForm({
             <input type="hidden" name="reviewsLength" value={reviewFields.length} />
             <div className="grid gap-5 md:col-span-2 md:grid-cols-2 xl:grid-cols-3">
               {reviewFields.map((review, index) => (
-                <div key={`${index}-${review.author}-${review.text.slice(0, 24)}`} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
+                <div key={index} className="grid gap-3 border border-zinc-200 bg-frtp-gray p-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-xs font-black uppercase tracking-[0.2em] text-frtp-blue">Avis {index + 1}</p>
                     <div className="flex gap-2">
@@ -1254,14 +1254,15 @@ function StudioForm({
                 </div>
               ))}
             </div>
-            <div className="md:col-span-2">
-              <Field label="Titre appel a l'action bas de page" name="homeCtaTitle" defaultValue={settings.homeCtaTitle} />
-            </div>
+          </div>
+        </section>
+        <section data-studio-group="cta" className="bg-white p-6"><h3>Appel à l’action</h3>
+          <div className="mt-5 grid gap-5">
+            <Field label="Titre appel a l'action bas de page" name="homeCtaTitle" defaultValue={settings.homeCtaTitle} />
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6 xl:col-span-2">
-          <h3 className="text-xl font-black text-zinc-950">Pages Activités</h3>
+        <section data-studio-group="activities" className="border border-zinc-200 bg-white p-6 xl:col-span-2"><h3 className="text-xl font-black text-zinc-950">Pages Activités</h3>
           <div className="mt-5 grid gap-5">
             <Field label="Titre page Activités" name="activitiesPageTitle" defaultValue={settings.activitiesPageTitle} />
             <TextArea label="Texte page Activités" name="activitiesPageText" defaultValue={settings.activitiesPageText} />
@@ -1298,8 +1299,7 @@ function StudioForm({
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6 xl:col-span-2">
-          <h3 className="text-xl font-black text-zinc-950">Pages Réalisations et Actualités</h3>
+        <section data-studio-group="listing" className="border border-zinc-200 bg-white p-6 xl:col-span-2"><h3 className="text-xl font-black text-zinc-950">Pages Réalisations et Actualités</h3>
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <Field label="Titre page Réalisations" name="projectsPageTitle" defaultValue={settings.projectsPageTitle} />
             <TextArea label="Texte page Réalisations" name="projectsPageText" defaultValue={settings.projectsPageText} />
@@ -1308,8 +1308,7 @@ function StudioForm({
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6 xl:col-span-2">
-          <h3 className="text-xl font-black text-zinc-950">Page Contact et coordonnées</h3>
+        <section data-studio-group="contact" className="border border-zinc-200 bg-white p-6 xl:col-span-2"><h3 className="text-xl font-black text-zinc-950">Page Contact et coordonnées</h3>
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <Field label="Titre contact" name="contactTitle" defaultValue={settings.contactTitle} />
             <TextArea label="Texte d'intro de la page contact" name="contactPageText" defaultValue={settings.contactPageText} />
@@ -1325,8 +1324,7 @@ function StudioForm({
           </div>
         </section>
 
-        <section className="border border-zinc-200 bg-white p-6 xl:col-span-2">
-          <h3 className="text-xl font-black text-zinc-950">Pages legales</h3>
+        <section data-studio-group="legal" className="border border-zinc-200 bg-white p-6 xl:col-span-2"><h3 className="text-xl font-black text-zinc-950">Pages legales</h3>
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <Field label="Titre mentions legales" name="legalTitle" defaultValue={settings.legalTitle} />
             <Field label="Titre confidentialite" name="privacyTitle" defaultValue={settings.privacyTitle} />
@@ -1980,13 +1978,14 @@ function TextArea({
     const formattedText = formatText(selectedText, format);
 
     textarea.value = `${before}${formattedText}${after}`;
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
     textarea.focus();
     textarea.setSelectionRange(start, start + formattedText.length);
   }
 
   return (
-    <label className="grid gap-2 text-sm font-bold">
-      {label}
+    <div className="grid gap-2 text-sm font-bold">
+      <label htmlFor={`editor-${name}`}>{label}</label>
       <div className="flex flex-wrap gap-1 border border-zinc-200 bg-frtp-gray p-2">
         {textFormatButtons.map((button) => (
           <button
@@ -2000,13 +1999,13 @@ function TextArea({
           </button>
         ))}
       </div>
-      <textarea ref={textareaRef} name={name} rows={rows} placeholder={placeholder} defaultValue={defaultValue ?? ""} className="resize-none border border-zinc-300 px-3 py-3 font-normal outline-none focus:border-frtp-blue" />
+      <textarea id={`editor-${name}`} ref={textareaRef} name={name} rows={rows} placeholder={placeholder} defaultValue={defaultValue ?? ""} className="resize-none border border-zinc-300 px-3 py-3 font-normal outline-none focus:border-frtp-blue" />
       {richHint ? (
         <span className="text-xs font-semibold leading-5 text-zinc-500">
           Mise en forme : une ligne courte devient un titre, une ligne vide sépare les blocs, "- texte" crée une liste, **texte** met en gras.
         </span>
       ) : null}
-    </label>
+    </div>
   );
 }
 

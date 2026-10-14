@@ -12,7 +12,7 @@ export async function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-9 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr] md:px-6 md:py-12">
         <div>
           <Logo variant="white" className="h-12 w-auto md:h-16" />
-          <p className="mt-5 max-w-md text-sm leading-7 text-zinc-300 md:mt-6">
+          <p data-studio-field="footerText" className="mt-5 max-w-md text-sm leading-7 text-zinc-300 md:mt-6">
             {studio.footerText}
           </p>
           <div className="mt-6 h-1 w-32 bg-gradient-to-r from-frtp-blue to-frtp-orange" />

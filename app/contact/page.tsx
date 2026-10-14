@@ -23,14 +23,14 @@ export default async function ContactPage() {
         <div className="lg:sticky lg:top-32">
           <SectionHeading
             eyebrow="Demande de devis"
-            title={studio.contactTitle}
-            text={studio.contactPageText}
+            title={studio.contactTitle} studioTitle="contactTitle"
+            text={studio.contactPageText} studioText="contactPageText"
             level={1}
           />
 
           <aside className="contact-info-panel mt-8 border border-zinc-200 bg-white p-5 shadow-technical md:mt-10 md:p-6">
             <p className="text-sm font-black uppercase tracking-[0.22em] text-frtp-orange">Informations utiles</p>
-            <RichText content={studio.contactText} className="mt-4 text-sm leading-7 text-zinc-600" />
+            <RichText studioField="contactText" content={studio.contactText} className="mt-4 text-sm leading-7 text-zinc-600" />
 
             <div className="mt-6 grid gap-3 text-sm font-bold text-zinc-950">
               <a href={`tel:${studio.phone.replace(/\s/g, "")}`} className="contact-info-row">

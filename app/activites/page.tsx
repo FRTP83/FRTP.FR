@@ -24,7 +24,7 @@ export default async function ActivitiesPage() {
       <div className="dark-panel px-4 pb-14 pt-12 text-white md:px-6 md:pb-20 md:pt-18">
         <div className="mx-auto max-w-7xl">
           <p className="inline-flex border-l-4 border-frtp-orange pl-3 text-[11px] font-black uppercase tracking-[0.2em] text-blue-200 md:text-xs md:tracking-[0.24em]">Prestations et zones d’intervention</p>
-          <h1 className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
+          <h1 data-studio-field="activitiesPageTitle" className="mt-5 max-w-4xl font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight text-white md:text-7xl">
             {studio.activitiesPageTitle}
           </h1>
           <nav aria-label="Sections de la page" className="mt-7 flex flex-wrap gap-3 text-sm font-bold">
