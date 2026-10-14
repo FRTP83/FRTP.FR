@@ -7,6 +7,7 @@ import { normalizeCopyObject, normalizeFrenchCopy } from "@/lib/french-copy";
 import { resolveLegacyLocation, validateLocation } from "@/lib/geography-server";
 
 export type SiteProject = (typeof fallbackProjects)[number] & {
+  id?: string;
   categories: string[];
   galleryImages?: Array<{
     url: string;
@@ -21,6 +22,7 @@ export type SiteNews = (typeof fallbackNews)[number] & {
   created_at?: string | null;
 };
 export type SiteActivity = (typeof fallbackActivities)[number] & {
+  featuredProjectId?: string;
   interventionExample: string;
 };
 
@@ -122,6 +124,7 @@ export async function getProjectsForSite(): Promise<SiteProject[]> {
       ? validateLocation(project.department_code, project.city_code)
       : resolveLegacyLocation(project.city ?? "");
     return {
+      id: project.id,
       title: normalizeFrenchCopy(project.title),
       slug: project.slug,
       city: location?.city ?? normalizeFrenchCopy(project.city ?? "Commune à préciser"),
@@ -192,6 +195,7 @@ export async function getActivitiesForSite(): Promise<SiteActivity[]> {
 
     return {
       ...activity,
+      featuredProjectId: studioActivity?.featuredProjectId,
       title: studioActivity?.title || activity.title,
       description: studioActivity?.description || activity.description,
       services: studioActivity?.services?.length ? studioActivity.services : activity.services,

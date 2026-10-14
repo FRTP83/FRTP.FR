@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileText, ShieldCheck, Star, StarHalf } from "lucide-react";
 import { BeforeAfterHomeCarousel } from "@/components/BeforeAfterHomeCarousel";
+import { HomeActivityExplorer } from "@/components/HomeActivityExplorer";
 import { SectionHeading } from "@/components/SectionHeading";
 import { getActivitiesForSite, getBeforeAfterItemsForSite, getProjectsForSite, getStudioSettings } from "@/lib/server-data";
 
@@ -105,45 +106,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-activities-light section-light section-inverted-dark bg-frtp-mist px-4 py-10 md:px-6 md:py-14">
+      <section className="home-activities-light has-interactive-explorer section-light section-inverted-dark bg-frtp-mist px-4 py-10 md:px-6 md:py-14">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Activités"
             title={studio.homeActivitiesTitle}
             text={studio.homeActivitiesText}
           />
-          <div className="home-activities-list mt-7 grid md:mt-9 md:grid-cols-2 xl:grid-cols-3">
-            {activities.slice(0, 6).map((activity, index) => {
-              const Icon = activity.icon;
-              return (
-                <Link
-                  data-gsap
-                  key={activity.slug}
-                  href={`/activites/${activity.slug}`}
-                  className="home-activity-card group bg-white p-4 shadow-technical ring-1 ring-zinc-900/8 transition md:p-5"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="home-activity-index">{String(index + 1).padStart(2, "0")}</span>
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <Icon size={20} className="text-frtp-orange" />
-                        <h3 className="text-lg font-black text-zinc-950 md:text-xl">{activity.title}</h3>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="mt-3 max-w-xl text-sm font-medium leading-[1.45] text-zinc-600">{activity.description}</p>
-                  <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[12px] font-semibold leading-tight text-zinc-700">
-                    {activity.services.slice(0, 3).map((service) => (
-                      <span key={service} className="home-activity-service">{service}</span>
-                    ))}
-                  </div>
-                  <span className="mt-4 inline-flex items-center gap-2 text-[13px] font-black text-frtp-orange">
-                    Détail de l'activité <ArrowRight size={17} />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+          <HomeActivityExplorer activities={activities} projects={projects} heading={studio.homeActivitiesTitle} />
         </div>
       </section>
 
@@ -165,17 +135,17 @@ export default async function HomePage() {
                 data-gsap
                 key={project.slug}
                 href={`/realisations/${project.slug}`}
+                data-layout-adapted
                 className="home-project-tile group"
               >
-                <Image
+                <div className="frtp-project-photo"><Image
                   src={project.image}
                   alt={project.title}
                   fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   className="object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
                 />
-                <span className="home-project-overlay" />
-                <span className="home-project-category">{project.categories.join(" · ")}</span>
+                </div>
                 <span className="home-project-content">
                   <span className="home-project-city">{project.city} · {project.date}</span>
                   <span className="home-project-title">{project.title}</span>
@@ -184,6 +154,7 @@ export default async function HomePage() {
                     Voir le chantier <ArrowRight size={15} />
                   </span>
                 </span>
+                <span className="home-project-category">{project.categories.join(" · ")}</span>
               </Link>
             ))}
           </div>

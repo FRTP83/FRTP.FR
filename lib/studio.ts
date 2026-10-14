@@ -1,6 +1,7 @@
 import { activities as defaultActivities, stats as defaultStats } from "@/lib/data";
 
 export type StudioActivity = {
+  featuredProjectId?: string;
   slug: string;
   title: string;
   description: string;

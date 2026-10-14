@@ -707,6 +707,7 @@ export function AdminConsole() {
         <StudioForm
           key={JSON.stringify(studioSettings)}
           settings={studioSettings}
+          projects={projects}
           onSubmit={saveStudio}
           loading={loading}
         />
@@ -715,6 +716,7 @@ export function AdminConsole() {
       {activeTab === "beforeAfter" ? (
         <BeforeAfterForm
           items={beforeAfterItems}
+          categories={categories}
           onSubmit={saveBeforeAfter}
           loading={loading}
         />
@@ -840,14 +842,21 @@ function EntityList({
 
 function BeforeAfterForm({
   items,
+  categories,
   onSubmit,
   loading
 }: {
   items: BeforeAfterItem[];
+  categories: Category[];
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   loading: boolean;
 }) {
   const [localItems, setLocalItems] = useState<BeforeAfterItem[]>(items);
+  const categoryOptions = Array.from(new Set([
+    "Travaux publics",
+    ...(categories.length ? categories.map((category) => category.name) : defaultStudioSettings.activities.map((activity) => activity.title)),
+    ...localItems.map((item) => item.category).filter(Boolean)
+  ]));
 
   useEffect(() => {
     setLocalItems(items);
@@ -942,8 +951,11 @@ function BeforeAfterForm({
               </label>
               <LocationFields city={item.city} cityCode={item.cityCode} departmentCode={item.departmentCode} names={{ city: `itemCity${index}`, cityCode: `itemCityCode${index}`, departmentCode: `itemDepartmentCode${index}` }} />
               <label className="grid gap-2 text-sm font-bold">
-                Categorie
-                <input name={`itemCategory${index}`} value={item.category} onChange={(event) => updateItem(index, "category", event.target.value)} className="h-12 border border-zinc-300 px-3 font-normal outline-none focus:border-frtp-blue" />
+                Catégorie
+                <select name={`itemCategory${index}`} value={item.category} onChange={(event) => updateItem(index, "category", event.target.value)} className="h-12 border border-zinc-300 bg-white px-3 font-normal outline-none focus:border-frtp-blue">
+                  {!item.category && <option value="">Choisir une catégorie</option>}
+                  {categoryOptions.map((category) => <option key={category} value={category}>{category}</option>)}
+                </select>
               </label>
               <label className="flex items-center gap-2 text-sm font-bold">
                 <input name={`itemPublished${index}`} type="checkbox" checked={item.isPublished} onChange={(event) => updateItem(index, "isPublished", event.target.checked)} className="h-4 w-4" />
@@ -993,10 +1005,12 @@ function moveArrayItem<T>(items: T[], index: number, direction: -1 | 1) {
 
 function StudioForm({
   settings,
+  projects,
   onSubmit,
   loading
 }: {
   settings: StudioSettings;
+  projects: ProjectRow[];
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   loading: boolean;
 }) {
@@ -1263,6 +1277,17 @@ function StudioForm({
                     disableDown={index === activityFields.length - 1}
                   />
                   <input type="hidden" name={`activitySlug${index}`} value={activity.slug} />
+                  {activity.slug !== "demolition-reprise" ? <label className="grid gap-2 text-sm font-bold text-zinc-700">
+                    Chantier affiché dans le schéma interactif
+                    <select name={`activityProject-${activity.slug}`} defaultValue={activity.featuredProjectId ?? ""} className="min-h-12 w-full border border-zinc-300 bg-white px-3 py-3 text-sm font-medium text-zinc-950">
+                      <option value="">Automatique selon la catégorie</option>
+                      <option value="none">Aucun chantier</option>
+                      {activity.featuredProjectId && activity.featuredProjectId !== "none" && !projects.some(project => project.id === activity.featuredProjectId && project.is_published) ? <option value={activity.featuredProjectId}>Chantier non publié — photo masquée</option> : null}
+                      {projects.filter(project => project.is_published).map(project => <option key={project.id} value={project.id}>{project.title}{project.city ? ` — ${project.city}` : ""}</option>)}
+                    </select>
+                    <span className="text-xs font-normal leading-5 text-zinc-500">La photo, le titre et le lien sont repris du chantier sélectionné. Seuls les chantiers publiés sont affichés sur le site.</span>
+                  </label>
+                  : null}
                   <Field label="Titre" name={`activityTitle-${activity.slug}`} defaultValue={activity.title} />
                   <TextArea label="Description" name={`activityDescription-${activity.slug}`} defaultValue={activity.description} />
                   <TextArea label="Prestations" name={`activityServices-${activity.slug}`} defaultValue={activity.services.join("\n")} />

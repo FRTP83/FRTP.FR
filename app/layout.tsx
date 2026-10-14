@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import "@/app/globals.css";
+import "@/app/home-layout.css";
+import "@/app/construction-explorer.css";
+import "@/app/activity-theme.css";
 import { GsapPageEffects } from "@/components/GsapPageEffects";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";

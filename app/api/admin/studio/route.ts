@@ -134,6 +134,17 @@ export async function POST(request: Request) {
     privacyText: stringValue(formData, "privacyText", defaultStudioSettings.privacyText)
   };
 
+  const selectedIds = Array.from(new Set(nextSettings.activities.map(activity => activity.featuredProjectId).filter((id): id is string => Boolean(id && id !== "none"))));
+  if (selectedIds.length) {
+    const result = await supabase.from("projects").select("id, is_published").in("id", selectedIds);
+    if (result.error) return NextResponse.json({ error: "Impossible de vérifier les chantiers sélectionnés." }, { status: 500 });
+    const publishedIds = new Set((result.data ?? []).filter(project => project.is_published).map(project => project.id));
+    const previousActivities = current.activities ?? defaultStudioSettings.activities;
+    if (nextSettings.activities.some(activity => activity.featuredProjectId && activity.featuredProjectId !== "none" && !publishedIds.has(activity.featuredProjectId) && !previousActivities.some(previous => previous.slug === activity.slug && previous.featuredProjectId === activity.featuredProjectId))) {
+      return NextResponse.json({ error: "Choisissez un chantier publié pour le schéma interactif." }, { status: 400 });
+    }
+  }
+
   await supabase.storage.createBucket("site-assets", { public: true }).catch(() => null);
 
   for (const field of imageFields) {
@@ -248,7 +259,8 @@ function activitiesValue(formData: FormData, fallback: StudioSettings["activitie
       title: stringValue(formData, `activityTitle-${slug}`, activity.title),
       description: stringValue(formData, `activityDescription-${slug}`, activity.description),
       services: linesValue(formData, `activityServices-${slug}`, activity.services),
-      interventionExample: stringValue(formData, `activityIntervention-${slug}`, activity.interventionExample)
+      interventionExample: stringValue(formData, `activityIntervention-${slug}`, activity.interventionExample),
+      featuredProjectId: formData.has(`activityProject-${slug}`) ? String(formData.get(`activityProject-${slug}`) ?? "").trim() : activity.featuredProjectId
     };
   }).filter((activity) => activity.slug);
 }
