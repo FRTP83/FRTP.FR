@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, FileText, ShieldCheck, Star, StarHalf } from "lucide-react";
+import { ArrowRight, FileText, ShieldCheck, Star, StarHalf } from "lucide-react";
 import { BeforeAfterHomeCarousel } from "@/components/BeforeAfterHomeCarousel";
 import { HomeActivityExplorer } from "@/components/HomeActivityExplorer";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -63,22 +63,6 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div data-hero-line className="hidden md:block">
-            <div data-parallax-slow className="ml-auto max-w-sm border border-white/12 bg-frtp-graphite/96 p-6 text-white shadow-lifted backdrop-blur-xl">
-              <p data-studio-field="heroPanelEyebrow" className="text-xs font-black uppercase tracking-[0.3em] text-frtp-orange">{studio.heroPanelEyebrow}</p>
-              <p data-studio-field="heroPanelTitle" className="mt-4 font-display text-2xl font-bold leading-tight text-white">
-                {studio.heroPanelTitle}
-              </p>
-              <div className="mt-6 grid gap-3 text-sm font-semibold text-zinc-200">
-                {studio.heroPanelItems.map((item) => (
-                  <span key={item} className="flex items-center gap-3">
-                    <CheckCircle2 size={18} className="text-frtp-orange" />
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
